@@ -5,8 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx @11ty/eleventy",
-    "start": "npx @11ty/eleventy --serve",
-    "lint": "npx eslint ."
+    "start": "npx @11ty/eleventy --serve"
   },
   "keywords": [],
   "author": "",
