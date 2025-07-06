@@ -16,4 +16,4 @@ title: DailyShip
 </ul>
 </nav>
 <hr>
-<ds-clock/>
+<ds-clock></ds-clock>
