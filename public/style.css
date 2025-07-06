@@ -12,10 +12,11 @@ body {
 	margin:0 1em 1em;
 }
 a {
-	color:#FFAAAA;
+	color:#FF9090;
 	text-decoration:none;
 }
 a:hover {background:#001020;}
+aside {float:right;}
 h1 {
 	margin:0;
 	font-variant: small-caps;
@@ -24,6 +25,8 @@ hr, .menu {
 	border-color: #008080;
 	border-style:dotted;
 	border-width:0 0 .5em;
+}
+hr {
 	margin:1em -1em;
 }
 nav a, nav .a {
@@ -34,6 +37,14 @@ nav a, nav .a {
 nav li {list-style: none;}
 nav ul {padding:0;margin:0 -1rem;}
 ul {margin:0;}
+ds-clock {
+	background:rgba(0,0,0,.5);
+	display:block;
+	border-radius: 8px;
+	float:left;
+	padding:0 .5em;
+	margin: 0 -.5em;
+}
 .menu {
 	border-width:0 0 1em;
 }

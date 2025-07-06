@@ -2,7 +2,7 @@
 layout: page.html
 title: DailyShip
 ---
-<p>Ship your projects faster than competitors!
+<p>Ship projects faster than your competitors!
 <nav class='big'>
 <ul>
 <li><a href='https://vezquex.github.io/'>Clocks</a>
@@ -16,4 +16,4 @@ title: DailyShip
 </ul>
 </nav>
 <hr>
-<ds-clock class='grow'></ds-clock>
+<ds-clock/>
