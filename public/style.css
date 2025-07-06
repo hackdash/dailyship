@@ -1,6 +1,6 @@
-* {box-sizing: border-box;}
+* {box-sizing:border-box;}
 :root {
-	--accent: #A080C0;
+	--accent:#A080C0;
 	color-scheme:dark;
 }
 body {
@@ -17,23 +17,22 @@ a {
 }
 a:hover {background:#001020;}
 h1 {
+	font-size:2em;
+	font-variant:small-caps;
 	margin:0;
-	font-variant: small-caps;
 }
 hr, .menu {
-	border-color: #008080;
+	border-color:#008080;
 	border-style:dotted;
 	border-width:0 0 .5em;
 }
-hr {
-	margin:1em -1em;
-}
+hr {margin:1em -1em;}
 nav a, nav .a {
 	display:block;
-	line-height: 2;
+	line-height:2;
 	padding:0 1rem;
 }
-nav li {list-style: none;}
+nav li {list-style:none;}
 nav ul {padding:0;margin:0 -1rem;}
 ul {margin:0;}
 ds-clock {
