@@ -1,0 +1,19 @@
+---
+layout: page.html
+title: DailyShip
+---
+<p>Ship your projects faster than competitors!
+<nav class='big'>
+<ul>
+<li><a href='https://vezquex.github.io/'>Clocks</a>
+</ul>
+</nav>
+<hr>
+<h1>Resources</h1>
+<nav>
+<ul>
+<li><a href='https://www.11ty.dev/'>Eleventy static site generator</a>
+</ul>
+</nav>
+<hr>
+<ds-clock class='grow'></ds-clock>

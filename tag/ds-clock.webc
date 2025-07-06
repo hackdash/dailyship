@@ -1,0 +1,133 @@
+<template id="ds-clock">
+<div class="clock">
+	<p>
+		<span class="numdate copy"></span>
+		<span class="weekday_ja copy day-color"></span>
+	</p>
+	<p class="time copy day-color">
+		<span class="hours">&nbsp;&nbsp;</span><span class='sep'>:</span><span class="minutes">&nbsp;&nbsp;</span><span class="seconds-wrap" style="cursor:zoom-out;"><span><span class='sep'>:</span><span class="seconds"></span></span></span>
+	</p>
+	<p class="date copy"></p>
+</div>
+<style webc:keep>
+.clock {
+	font-size:2em;
+	line-height:1.5;
+	margin:0;
+	display:flex;
+	flex-direction:column;
+}
+p {margin:0;overflow:hidden;}
+.copy {cursor:copy; user-select: none;}
+.seconds-wrap {flex-grow:1; font-size:.5em; line-height:2.75; height:2em;}
+.time {font-size:3.5em; line-height:1; display:flex;}
+[day='0'] .day-bg {background:#202000;}
+[day='0'] .day-color {color:#E0E000;}
+[day='1'] .day-bg {background:#201820;}
+[day='1'] .day-color {color:#9060FF;}
+[day='2'] .day-bg {background:#200000;}
+[day='2'] .day-color {color:#C02000;}
+[day='3'] .day-bg {background:#001020;}
+[day='3'] .day-color {color:#3060C0;}
+[day='4'] .day-bg {background:#001000;}
+[day='4'] .day-color {color:#30C030;}
+[day='5'] .day-bg {background:#201A08;}
+[day='5'] .day-color {color:#E8D880;}
+[day='6'] .day-bg {background:#180900;}
+[day='6'] .day-color {color:#FFA040;}
+</style>
+</template>
+
+<script webc:keep>
+class DsClock extends HTMLElement {
+	connectedCallback(){
+		const template = document.getElementById('ds-clock')
+		const root = this.attachShadow({mode:'open'})
+		root.appendChild(template.content.cloneNode(true))
+		clock_widget(root)
+	}
+}
+customElements.define('ds-clock',DsClock)
+const eid = document.getElementById.bind(document)
+function clock_widget(root){
+	if(!root){ return; }
+	const clock = {
+		el: root.children[0],
+		sec: true,
+	}
+
+	;(['date','hours','minutes','numdate','seconds','weekday_ja']).forEach(function(component){
+		clock[component] = clock.el.querySelector('.'+component)
+	})
+
+	const locale = 'en-us'
+
+	const display = function(t){
+		const seconds_fmt = pad2(t.getSeconds())
+		clock.seconds.innerHTML = seconds_fmt
+		const minutes = t.getMinutes()
+		const minutes_fmt = clock.minutes.innerHTML = pad2(minutes)
+		const hours = t.getHours()
+		const hours_fmt = clock.hours.innerHTML = pad2(hours)
+		clock.numdate.innerHTML = numdate_text(t)
+		clock.weekday_ja.innerHTML = t.toLocaleString('ja-JP', {weekday:'short'})
+		clock.el.setAttribute('day', t.getDay())
+		clock.date.innerHTML = date_text(t)
+		const emoji = String.fromCodePoint(
+			((hours % 12) || 12) + 0x1F54F
+			+ (minutes < 30 ? 0 : 12)
+		)
+	}
+
+	function date_text(t){
+		return `${t.toLocaleString(locale, {weekday:'long'})}, ${t.toLocaleString(locale, {month:'long'})} ${t.getDate()}`
+	}
+	function numdate_text(t){
+		return t.getFullYear()+'-'+pad2(t.getMonth()+1)+'-'+pad2(t.getDate())
+	}
+	function time_text(t){
+		return `${pad2(t.getHours())}:${pad2(t.getMinutes())}${clock.sec?':'+pad2(t.getSeconds()):''}`
+	}
+
+	const synchronize = function(){
+		let t = new Date()
+		// t = new Date(Date.now() + 1*864e5)
+		clock.t = t
+		display(t)
+		window.setTimeout(synchronize, 1000 - (t % 1000))
+	}
+
+	synchronize()
+
+	clock.numdate.addEventListener('click', copy_text.bind(null, ()=> numdate_text(clock.t)))
+	clock.el.querySelector('.time').addEventListener('click',
+		copy_text.bind(null, ()=>time_text(clock.t))
+	)
+	clock.date.addEventListener('click',
+		copy_text.bind(null, ()=>date_text(clock.t))
+	)
+	clock.weekday_ja.addEventListener('click',copy_text.bind(null, null))
+	clock.el.querySelector('.seconds-wrap').addEventListener('click', toggle_sec)
+
+	function toggle_sec(ev){
+		clock.sec = !clock.sec
+		const sec_style = ev.currentTarget.style
+		sec_style.cursor = (clock.sec) ? 'zoom-out' : 'zoom-in'
+		ev.currentTarget.firstElementChild.style.visibility = (clock.sec) ? 'visible' : 'hidden'
+		ev.stopPropagation();
+	}
+}
+
+function copy_text(get_text, ev){
+	navigator.clipboard.writeText(get_text ? get_text() : ev.currentTarget.innerText)
+	const target = ev.currentTarget
+	target.classList.add('day-bg')
+	window.setTimeout(()=>target.classList.remove('day-bg'), 150)
+}
+
+clock_widget()
+
+function pad2(n){
+	return (n < 10) ? ('0' + n) : n
+}
+</script>
