@@ -50,7 +50,6 @@ class DsClock extends HTMLElement {
 customElements.define('ds-clock',DsClock)
 const eid = document.getElementById.bind(document)
 function clock_widget(root){
-	if(!root){ return; }
 	const clock = {
 		el: root.children[0],
 		sec: true,
@@ -124,8 +123,6 @@ function copy_text(get_text, ev){
 	target.classList.add('day-bg')
 	window.setTimeout(()=>target.classList.remove('day-bg'), 150)
 }
-
-clock_widget()
 
 function pad2(n){
 	return (n < 10) ? ('0' + n) : n
