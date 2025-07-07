@@ -40,10 +40,10 @@ ds-clock {
 	border-radius:8px;
 	clear:right;
 	display:block;
-	/* font-size:2em; */
 	float:left;
-	margin:0 1em 0 -.5em;
-	padding:0 .5em;
+	font-size:1.5em;
+	margin:0 20px 8px -4px;
+	padding:4px 4px 4px 6px;
 }
 .big {font-size:2em;}
 .clear {overflow:hidden;}
