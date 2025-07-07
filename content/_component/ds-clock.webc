@@ -90,16 +90,16 @@ function clock_widget({root,zone}){
 	const locale = 'en-us'
 
 	const display = function(t){
-		const seconds_fmt = pad2(t.getUTCSeconds())
+		const seconds_fmt = pad2(t.getSeconds())
 		clock.seconds.innerHTML = seconds_fmt
-		const minutes = t.getUTCMinutes()
+		const minutes = t.getMinutes()
 		const minutes_fmt = clock.minutes.innerHTML = pad2(minutes)
-		const hours = t.getUTCHours()
+		const hours = t.getHours()
 		const hours_fmt = clock.hours.innerHTML = pad2(hours)
 		clock.numdate.innerHTML = numdate_text(t)
 		clock.weekday_ja.innerHTML = t.toLocaleString('ja-JP', {weekday:'short'})
 		clock.zone_tag.innerHTML = `${clock.zone_disp > 0 ? '+' : ''}${clock.zone_disp||'UTC'}`
-		clock.el.setAttribute('day', t.getUTCDay())
+		clock.el.setAttribute('day', t.getDay())
 		clock.date.innerHTML = date_text(t)
 		const emoji = String.fromCodePoint(
 			((hours % 12) || 12) + 0x1F54F
@@ -108,19 +108,19 @@ function clock_widget({root,zone}){
 	}
 
 	function date_text(t){
-		return `${t.toLocaleString(locale, {weekday:'long'})}, ${t.toLocaleString(locale, {month:'long'})} ${t.getUTCDate()}`
+		return `${t.toLocaleString(locale, {weekday:'long'})}, ${t.toLocaleString(locale, {month:'long'})} ${t.getDate()}`
 	}
 	function numdate_text(t){
-		return t.getUTCFullYear()+'-'+pad2(t.getUTCMonth()+1)+'-'+pad2(t.getUTCDate())
+		return t.getFullYear()+'-'+pad2(t.getMonth()+1)+'-'+pad2(t.getDate())
 	}
 	function time_text(t){
-		return `${pad2(t.getUTCHours())}:${pad2(t.getUTCMinutes())}${clock.sec?':'+pad2(t.getUTCSeconds()):''}`
+		return `${pad2(t.getHours())}:${pad2(t.getMinutes())}${clock.sec?':'+pad2(t.getSeconds()):''}`
 	}
 
 	const synchronize = function(){
 		const offset = new Date().getTimezoneOffset()
 		clock.zone_disp = clock.zone - offset/60
-		const t = new Date(Date.now() + clock.zone_disp*3600e3)
+		const t = new Date(Date.now() + 3600e3*(clock.zone))
 		clock.t = t
 		display(t)
 		window.setTimeout(synchronize, 1000 - (t % 1000))
