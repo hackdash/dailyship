@@ -80,7 +80,7 @@ function clock_widget({root,zone}){
 	const clock = {
 		el: root.querySelector('.clock'),
 		sec: true,
-		zone: zone ? Number(zone) : -(new Date().getTimezoneOffset())/60,
+		zone_init: zone,
 	}
 
 	;(['date','hours','minutes','numdate','seconds','weekday_ja','zone_tag']).forEach(function(component){
@@ -98,7 +98,7 @@ function clock_widget({root,zone}){
 		const hours_fmt = clock.hours.innerHTML = pad2(hours)
 		clock.numdate.innerHTML = numdate_text(t)
 		clock.weekday_ja.innerHTML = t.toLocaleString('ja-JP', {weekday:'short'})
-		clock.zone_tag.innerHTML = `${clock.zone_disp > 0 ? '+' : ''}${clock.zone_disp||'UTC'}`
+		clock.zone_tag.innerHTML = `${clock.zone > 0 ? '+' : ''}${clock.zone||'UTC'}`
 		clock.el.setAttribute('day', t.getDay())
 		clock.date.innerHTML = date_text(t)
 		const emoji = String.fromCodePoint(
@@ -118,10 +118,9 @@ function clock_widget({root,zone}){
 	}
 
 	const synchronize = function(){
-		const offset = new Date().getTimezoneOffset() / 60
-		clock.zone = -offset
-		clock.zone_disp = clock.zone
-		const t = new Date(Date.now() + 3600e3*(clock.zone + offset))
+		clock.offset = new Date().getTimezoneOffset() / 60
+		clock.zone = clock.zone_init ? Number(clock.zone_init) : -clock.offset
+		const t = new Date(Date.now() + 3600e3*(clock.zone + clock.offset))
 		clock.t = t
 		display(t)
 		window.setTimeout(synchronize, 1000 - (t % 1000))
