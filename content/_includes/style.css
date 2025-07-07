@@ -1,6 +1,5 @@
 * {box-sizing:border-box;}
 :root {
-	--accent:#A080C0;
 	color-scheme:dark;
 }
 body {
@@ -41,8 +40,9 @@ ds-clock {
 	border-radius:8px;
 	clear:right;
 	display:block;
+	/* font-size:2em; */
 	float:left;
-	margin:0 -.5em;
+	margin:0 1em 0 -.5em;
 	padding:0 .5em;
 }
 .big {font-size:2em;}

@@ -1,5 +1,5 @@
 ---
-layout: page.html
+layout: page
 title: DailyShip
 ---
 <p>Ship projects faster than your competitors!
@@ -17,3 +17,4 @@ title: DailyShip
 </nav>
 <hr>
 <ds-clock></ds-clock>
+<ds-clock zone='7'></ds-clock>

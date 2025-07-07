@@ -1,24 +1,48 @@
-<template id="ds-clock">
-<div class="clock">
+<template class='ds-clock'>
+<link :href='getBundleFileUrl("css","ds-clock")' rel='stylesheet' webc:keep>
+<div class='clock'>
 	<p>
-		<span class="numdate copy"></span>
-		<span class="weekday_ja copy day-color"></span>
+		<span class='numdate copy'></span>
+		<span class='weekday_ja copy day-color'></span>
+		<span class='tag floodfill'>🌐</span>
+		<span class='tag zone_tag copy'></span>
 	</p>
-	<p class="time copy day-color">
-		<span class="hours">&nbsp;&nbsp;</span><span class='sep'>:</span><span class="minutes">&nbsp;&nbsp;</span><span class="seconds-wrap" style="cursor:zoom-out;"><span><span class='sep'>:</span><span class="seconds"></span></span></span>
+	<p class='time copy day-color'>
+		<span class='hours'>&nbsp;&nbsp;</span><span class='sep'>:</span><span class='minutes'>&nbsp;&nbsp;</span><span class='seconds-wrap' style='cursor:zoom-out;'><span><span class='sep'>:</span><span class='seconds'></span></span></span>
 	</p>
-	<p class="date copy"></p>
+	<p class='date copy'></p>
 </div>
-<style webc:keep>
+<style webc:bucket='ds-clock'>
+:host {
 .clock {
-	font-size:2em;
-	line-height:1.5;
-	margin:0;
 	display:flex;
 	flex-direction:column;
+	line-height:1.5;
+	margin:0;
+	position:relative;
 }
 p {margin:0;overflow:hidden;}
 .copy {cursor:copy; user-select: none;}
+.tag {
+	opacity:.25;
+	border-radius: 50%;
+	display:inline-block;
+	height:1.25rem;
+	line-height:1.25rem;
+	position:absolute;
+	right:0;
+	width:1.25rem;
+	text-align:center;
+}
+.floodfill {
+  color: transparent;
+  text-shadow: 0 0 0 #808080;
+}
+.zone_tag {
+	font-size:.5em;
+	font-weight:bold;
+	opacity:1;
+}
 .seconds-wrap {flex-grow:1; font-size:.5em; line-height:2.75; height:2em;}
 .time {font-size:3.5em; line-height:1; display:flex;}
 [day='0'] .day-bg {background:#202000;}
@@ -35,42 +59,47 @@ p {margin:0;overflow:hidden;}
 [day='5'] .day-color {color:#E8D880;}
 [day='6'] .day-bg {background:#180900;}
 [day='6'] .day-color {color:#FFA040;}
+}
 </style>
 </template>
-
-<script webc:keep>
+<script>
 class DsClock extends HTMLElement {
 	connectedCallback(){
-		const template = document.getElementById('ds-clock')
+		const template = document.querySelector('.ds-clock')
 		const root = this.attachShadow({mode:'open'})
 		root.appendChild(template.content.cloneNode(true))
-		clock_widget(root)
+		clock_widget({
+			root,
+			zone: this.getAttribute('zone'),
+		})
 	}
 }
 customElements.define('ds-clock',DsClock)
 const eid = document.getElementById.bind(document)
-function clock_widget(root){
+function clock_widget({root,zone}){
 	const clock = {
-		el: root.children[0],
+		el: root.querySelector('.clock'),
 		sec: true,
+		zone: Number(zone || 0),
 	}
 
-	;(['date','hours','minutes','numdate','seconds','weekday_ja']).forEach(function(component){
+	;(['date','hours','minutes','numdate','seconds','weekday_ja','zone_tag']).forEach(function(component){
 		clock[component] = clock.el.querySelector('.'+component)
 	})
 
 	const locale = 'en-us'
 
 	const display = function(t){
-		const seconds_fmt = pad2(t.getSeconds())
+		const seconds_fmt = pad2(t.getUTCSeconds())
 		clock.seconds.innerHTML = seconds_fmt
-		const minutes = t.getMinutes()
+		const minutes = t.getUTCMinutes()
 		const minutes_fmt = clock.minutes.innerHTML = pad2(minutes)
-		const hours = t.getHours()
+		const hours = t.getUTCHours()
 		const hours_fmt = clock.hours.innerHTML = pad2(hours)
 		clock.numdate.innerHTML = numdate_text(t)
 		clock.weekday_ja.innerHTML = t.toLocaleString('ja-JP', {weekday:'short'})
-		clock.el.setAttribute('day', t.getDay())
+		clock.zone_tag.innerHTML = `${clock.zone_disp > 0 ? '+' : ''}${clock.zone_disp||'UTC'}`
+		clock.el.setAttribute('day', t.getUTCDay())
 		clock.date.innerHTML = date_text(t)
 		const emoji = String.fromCodePoint(
 			((hours % 12) || 12) + 0x1F54F
@@ -79,18 +108,19 @@ function clock_widget(root){
 	}
 
 	function date_text(t){
-		return `${t.toLocaleString(locale, {weekday:'long'})}, ${t.toLocaleString(locale, {month:'long'})} ${t.getDate()}`
+		return `${t.toLocaleString(locale, {weekday:'long'})}, ${t.toLocaleString(locale, {month:'long'})} ${t.getUTCDate()}`
 	}
 	function numdate_text(t){
-		return t.getFullYear()+'-'+pad2(t.getMonth()+1)+'-'+pad2(t.getDate())
+		return t.getUTCFullYear()+'-'+pad2(t.getUTCMonth()+1)+'-'+pad2(t.getUTCDate())
 	}
 	function time_text(t){
-		return `${pad2(t.getHours())}:${pad2(t.getMinutes())}${clock.sec?':'+pad2(t.getSeconds()):''}`
+		return `${pad2(t.getUTCHours())}:${pad2(t.getUTCMinutes())}${clock.sec?':'+pad2(t.getUTCSeconds()):''}`
 	}
 
 	const synchronize = function(){
-		let t = new Date()
-		// t = new Date(Date.now() + 1*864e5)
+		const offset = new Date().getTimezoneOffset()
+		clock.zone_disp = clock.zone - offset/60
+		const t = new Date(Date.now() + clock.zone_disp*3600e3)
 		clock.t = t
 		display(t)
 		window.setTimeout(synchronize, 1000 - (t % 1000))
@@ -106,6 +136,7 @@ function clock_widget(root){
 		copy_text.bind(null, ()=>date_text(clock.t))
 	)
 	clock.weekday_ja.addEventListener('click',copy_text.bind(null, null))
+	clock.zone_tag.addEventListener('click',copy_text.bind(null, null))
 	clock.el.querySelector('.seconds-wrap').addEventListener('click', toggle_sec)
 
 	function toggle_sec(ev){
