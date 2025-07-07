@@ -80,7 +80,7 @@ function clock_widget({root,zone}){
 	const clock = {
 		el: root.querySelector('.clock'),
 		sec: true,
-		zone: Number(zone || 0),
+		zone: zone ? Number(zone) : -(new Date().getTimezoneOffset())/60,
 	}
 
 	;(['date','hours','minutes','numdate','seconds','weekday_ja','zone_tag']).forEach(function(component){
@@ -118,9 +118,9 @@ function clock_widget({root,zone}){
 	}
 
 	const synchronize = function(){
-		const offset = new Date().getTimezoneOffset()
-		clock.zone_disp = clock.zone - offset/60
-		const t = new Date(Date.now() + 3600e3*(clock.zone))
+		const offset = new Date().getTimezoneOffset() / 60
+		clock.zone_disp = clock.zone
+		const t = new Date(Date.now() + 3600e3*(clock.zone + offset))
 		clock.t = t
 		display(t)
 		window.setTimeout(synchronize, 1000 - (t % 1000))
