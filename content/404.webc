@@ -4,10 +4,13 @@ permalink: 404.html
 title: Not Found
 ---
 <h1>Not Found!</h1>
-<pre class='big'>
+<p class='italic'>
 "Would'st thou," so the helmsman answered,
+<br>
 "Learn the secret of the sea?
+<br>
 Only those who brave its dangers
+<br>
 Comprehend its mystery!"
-</pre>
+</p>
 <img src='/i/octolink.png' height='267' width='267'/>
