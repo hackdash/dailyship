@@ -122,9 +122,9 @@ function clock_widget({root,zone}){
 	}
 
 	const synchronize = function(){
-		clock.offset = new Date().getTimezoneOffset() / 60
-		clock.zone = clock.zone_init ? Number(clock.zone_init) : -clock.offset
-		const t = new Date(Date.now() + 3600e3*(clock.zone + clock.offset))
+		const offset = new Date().getTimezoneOffset() / 60
+		clock.zone = clock.zone_init ? Number(clock.zone_init) : -offset
+		const t = new Date(Date.now() + 3600e3*(clock.zone + offset))
 		clock.t = t
 		display(t)
 		window.setTimeout(synchronize, 1000 - (t % 1000))

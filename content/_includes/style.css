@@ -51,6 +51,7 @@ ds-clock {
 .menu {
 	border-width:0 0 1em;
 }
-.menu a {padding-top:1.5rem;}
+.menu a {padding:1.5rem .75rem 0; white-space:nowrap;}
 .menu a h1 {margin-top:-1.5rem;}
 .row {display:flex;flex-direction:row;}
+.wrap {flex-wrap: wrap;}
