@@ -1,8 +1,9 @@
 ---
 layout: page
 title: DailyShip
+description: Ship projects faster than your competitors!
 ---
-<p>Ship projects faster than your competitors!
+<p @text='description'></p>
 <nav class='big'>
 <ul>
 <li><a href='https://vezquex.github.io/'>Clocks</a>
