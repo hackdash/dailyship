@@ -47,6 +47,7 @@ ds-clock {
 }
 .big {font-size:2em;}
 .clear {overflow:hidden;}
+.date {font-family:'Roboto Mono',monospace;}
 .grow {flex-grow:1;}
 .italic {font-style:italic;}
 .menu {
