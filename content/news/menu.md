@@ -4,10 +4,6 @@ date: 2025-07-23
 ---
 
 <style>
-  * { box-sizing: border-box; }
-  body { margin:0; }
-  p { margin:1em; }
-
   .demo-menu {
     --height: 2em;
     --padding: .5em;
