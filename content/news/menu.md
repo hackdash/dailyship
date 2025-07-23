@@ -139,8 +139,8 @@ CSS markers are limited to text, so we replace it with a larger `::before` pseud
   }
   summary::before {
     background-color: red;
-    content:'';
-    float:left;
+    content: '';
+    float: left;
     height: var(--height);
     margin-right: var(--padding);
     width: var(--height);
