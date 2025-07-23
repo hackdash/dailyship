@@ -30,8 +30,8 @@ date: 2025-07-23
     }
     summary::before {
       background-color: maroon;
-      content:'';
-      float:left;
+      content: '';
+      float: left;
       height: var(--height);
       margin-right: var(--padding);
       width: var(--height);
