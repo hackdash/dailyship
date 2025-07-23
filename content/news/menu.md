@@ -19,7 +19,8 @@ date: 2025-07-23
     }
     a {
       display: block;
-      padding-left: calc(var(--padding) + var(--height));
+      padding-left: calc(var(--height) + var(--padding));
+      padding-right: calc(16px + var(--padding));
       text-decoration: none;
     }
     a:hover { background: maroon; }
@@ -108,7 +109,9 @@ Theory is all well and good, but how do you get started? As always, we start wit
 </details>
 ```
 # CSS
-These styles create a top menu button that opens a scrolling vertical list of links. You may set the width to 100% if you like. CSS markers are limited to text, so we replace it with a larger `::before` pseudo-element that turns green when the menu is open. I've adjusted the padding-left to line up the text with the larger marker.
+These styles create a top menu button that opens a scrolling vertical list of links. You may set the width to `100%` if you like. Make sure to pad the right side of the `<ul>` or the `<a>` by at least 16px for the scrollbar.
+
+CSS markers are limited to text, so we replace it with a larger `::before` pseudo-element that turns green when the menu is open. I've adjusted the padding-left to line up the text with the larger marker.
 ```
 .menu {
   --height: 2em;
@@ -125,7 +128,8 @@ These styles create a top menu button that opens a scrolling vertical list of li
   }
   a {
     display: block;
-    padding-left: calc(var(--padding) + var(--height));
+    padding-left: calc(var(--height) + var(--padding));
+    padding-right: calc(16px + var(--padding));
     text-decoration: none;
   }
   a:hover { background: orange; }
