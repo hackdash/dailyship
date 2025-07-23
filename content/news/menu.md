@@ -91,11 +91,11 @@ There's nothing quite like a vertically scrolling list. If you've ever had the p
 
 I recommend starting with alphabetical order. This will create a dictionary-like search paradigm until you feel the need to add filtering.
 
-You may end up adding sections of related menu items. Just please avoid reordering menu items. And consider that it is quite easy to use a single list. Categories actually slow down the user from getting to a specific item. Categories are for people who don't know what they want yet. You could have category pages instead of polluting the main menus.
+Sections of related menu items might be desired. Just please avoid reordering menu items. And consider that it is quite easy to use a single list. Categories actually slow down the user from getting to a specific item. Categories are for people who don't know what they want yet. You could have category pages instead of polluting the main menus.
 
-Sliding the page around is disorienting when opening or closing the menu, so do not add this in. You may make the menu slide into view if you require animations. You may also fade the page if it distracts from the menu.
+Never slide the page around, as that would be disorienting. The menu could slide in from off the screen if you require animations. You may also fade the page if it distracts from the menu.
 
-Theory is all well and good, but how do you get started? As always, we start with HTML, and add CSS for layout. This demo will not require JavaScript, and you may want to stick with CSS to avoid pitfalls.
+Theory is all well and good, but how do you get started? As always, we start with HTML, and add CSS for layout. This demo will not require JavaScript, and I recommend sticking with CSS to avoid pitfalls.
 
 # HTML menu
 ```
