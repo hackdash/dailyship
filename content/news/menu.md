@@ -85,7 +85,7 @@ date: 2025-07-23
   </ul>
 </details>
 
-How can we have a reasonable menu for a website that will work well on small and large screens alike? It should have some way of expanding so that is stays out of the way when we're focusing on the current page. If you are unsure, just have a link back to the home page and all navigation can be in the body of that page.
+How can we have a reasonable menu for a website that will work well on small and large screens alike? It should have some way of expanding so that is stays out of the way when we're focusing on the current page. If you are unsure, just have a link back to the home page and all navigation can be there in sitemap form.
 
 There's nothing quite like a vertically scrolling list. If you've ever had the pleasure to use the [Application Finder in Xfce](https://docs.xfce.org/xfce/xfce4-appfinder/start), you may share my disdain for various fly-out menus of the past or the grids of the future.
 
