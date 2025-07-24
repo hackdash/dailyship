@@ -32,9 +32,11 @@ Demo for Navigation Menu
     summary {
       height: var(--height);
       padding-left: 0;
+      user-select: none;
     }
     summary::before {
       background-color: red;
+      border-radius: 0 var(--height) var(--height) 0;
       content: '';
       float: left;
       height: var(--height);
