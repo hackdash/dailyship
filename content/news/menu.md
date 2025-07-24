@@ -27,9 +27,11 @@ date: 2025-07-23
     summary {
       height: var(--height);
       padding-left: 0;
+      user-select: none;
     }
     summary::before {
       background-color: maroon;
+      border-radius: 0 var(--height) var(--height) 0;
       content: '';
       float: left;
       height: var(--height);
@@ -100,6 +102,7 @@ Never slide the page around, as that would be disorienting. The menu could slide
 Theory is all well and good, but how do you get started? As always, we start with HTML, and add CSS for layout. This demo will not require JavaScript, and I recommend sticking with CSS to avoid pitfalls.
 
 # HTML menu
+`<details>` and `<summary>` provide the basic collapsing feature desired. Only the summary will be displayed at first. Upon clicking a summary, the parent element will enter its open state, as if you'd written `<details open>`, and all contents will be shown.
 ```
 <details class='menu'>
   <summary>Menu</summary>
@@ -111,9 +114,9 @@ Theory is all well and good, but how do you get started? As always, we start wit
 </details>
 ```
 # CSS
-These styles create a top menu button that opens a scrolling vertical list of links. You may set the width to `100%` if you like. Make sure to pad the right side of the `<ul>` or the `<a>` by at least 16px for the scrollbar.
+These nested styles lay out a top menu button that opens a scrolling vertical list of links. You may set the width to `100%` if you like. Make sure to pad the right side of the `<ul>` or the `<a>` by at least 16px for the scrollbar.
 
-CSS markers are limited to text, so we replace it with a larger `::before` pseudo-element that turns green when the menu is open. I've adjusted the padding-left to line up the text with the larger marker.
+CSS markers are limited to text, so we replace it with a more graphical `::before` pseudo-element that turns green when the menu is open. I've adjusted the padding-left to line up the text.
 ```
 .menu {
   --height: 2em;
@@ -138,9 +141,11 @@ CSS markers are limited to text, so we replace it with a larger `::before` pseud
   summary {
     height: var(--height);
     padding-left: 0;
+    user-select: none;
   }
   summary::before {
     background-color: red;
+    border-radius: 0 var(--height) var(--height) 0;
     content: '';
     float: left;
     height: var(--height);
