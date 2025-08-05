@@ -3,12 +3,24 @@ layout: page
 title: DailyShip
 description: Ship projects faster than your competitors!
 ---
-<p @text='description'></p>
 <nav class='big'>
-<ul>
-<li><a href='https://vezquex.github.io/'>Clocks</a>
-</ul>
+  <ul>
+    <li><a href='https://vezquex.github.io/'>Clocks</a>
+  </ul>
 </nav>
+<hr>
+<nav class='blt'>
+  <ul>
+    <li webc:for='post of collections.post.reverse()'>
+      <a :href='post.url' @text='post.data.title'></a>
+    </li>
+  </ul>
+</nav>
+<hr>
+<p>
+  <span @text='description' webc:nokeep></span>
+  <br>
+  Aboard this tiny ship, set sail for a three hour tour.
 <hr>
 <h1>Resources</h1>
 <nav>

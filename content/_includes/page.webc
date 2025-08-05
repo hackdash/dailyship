@@ -12,8 +12,8 @@
 <ul class='menu row wrap'>
 <li><a href='/'><h1>DailyShip 🚢</h1></a>
 <li><a href='https://qchat.rizon.net/?channels=dailyship'>Chat</a>
-<li><a href='https://github.com/hackdash/dailyship'>Code</a>
-<li class='grow'><a href='/news'>News</a>
+<li class='grow'><a href='https://github.com/hackdash/dailyship'>Code</a>
+<!-- <li class='grow'><a href='/news'>News</a> -->
 <li><a href='/404.html'>🐙</a>
 </ul>
 </nav>

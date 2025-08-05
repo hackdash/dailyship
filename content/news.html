@@ -4,7 +4,7 @@ description: The Daily Journal
 layout: page
 ---
 <h1>{{title}}</h1>
-<nav>
+<nav class='blt'>
 <ul>
 {%- for post in collections.post reversed -%}
 	<li><a href='{{post.url}}'>{{ post.data.title }}</a></li>
