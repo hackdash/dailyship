@@ -51,6 +51,7 @@ date: 2025-07-23
     }
   }
 </style>
+<div style='position:relative;'>
 <details class='demo-menu'>
   <summary>
     Menu
@@ -87,7 +88,7 @@ date: 2025-07-23
   </ul>
 </details>
 
-Note: See the [standalone demo page](/demo/menu) for the full-height menu experience. The example on this page is shortened to 50% height because it appears in the middle of a page, which is not ideal while you are also scrolling above it. If you would like a middle menu, then remove the `ul` styles for positioning and overflow (scrolling).
+Note: Right click "View Page Source" (Ctrl-U) See the [standalone demo page](/demo/menu) for the full-height menu experience. The example on this page is shortened to 50% height because it appears in the middle of a page, which is not ideal while you are also scrolling above it. If you would like a middle menu, then remove the `ul` styles for positioning and overflow (scrolling).
 
 How can we have a reasonable menu for a website that will work well on small and large screens alike? It should have some way of expanding so that is stays out of the way when we're focusing on the current page. If you are unsure, just have a link back to the home page and all navigation can be there in sitemap form.
 
