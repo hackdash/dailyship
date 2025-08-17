@@ -73,8 +73,6 @@ class Game {
 		this.width = this.canvas.width
 		this.height = this.canvas.height
 
-		this.scaleScreen(/*smooth=*/ true);
-
 		// Game state
 		this.score = 0;
 		this.gameRunning = true;
@@ -89,7 +87,7 @@ class Game {
 
 		// Input handling
 		this.keys = {};
-		this.setupEventListeners();
+		this.addEventListeners();
 
 		this.reset();
 
@@ -97,44 +95,14 @@ class Game {
 		this.gameLoop();
 	}
 
-	scaleScreen(smooth=true) {
-		const {canvas, ctx, width, height} = this
-		var scale = window.devicePixelRatio || 1;
-		var container = canvas.parentNode.getBoundingClientRect();
-		var zoom = Math.min(
-			(container.height / height),
-			(container.width / width),
-		);
-		var zoomScale = zoom * scale;
-		canvas.style.height = `${height * zoom}px`;
-		canvas.style.width = `${width * zoom}px`;
-		if(smooth){
-			canvas.height = height * zoomScale;
-			canvas.width = width * zoomScale;
-			ctx.scale(zoomScale, zoomScale);
-		}
-	}
-
-	setupEventListeners() {
-		document.addEventListener('keydown', (e) => {
-			this.keys[e.code] = true;
-
-			// if (e.code === 'ArrowUp' || e.code === 'KeyS' || e.code === 'KeyW' || e.code === 'ArrowDown' || e.code === 'Space') {
-			// 	e.preventDefault();
-			// 	this.fireBullet();
-			// }
-
-			if (e.code === 'KeyR') {
-				this.reset();
-			}
-		});
-
-		document.addEventListener('keyup', (e) => {
-			this.keys[e.code] = false;
-		});
+	gameLoop() {
+		this.update();
+		this.render();
+		requestAnimationFrame(() => this.gameLoop());
 	}
 
 	reset() {
+		this.scaleScreen();
 		this.score = 0;
 		this.gameRunning = true;
 		this.helicopterSpawnDelay = 0
@@ -160,6 +128,25 @@ class Game {
 		this.checkCollisions();
 		this.checkGameOver();
 		this.bullet_timer || this.fireBullet();
+	}
+
+	addEventListeners() {
+		document.addEventListener('keydown', (e) => {
+			this.keys[e.code] = true;
+
+			// if (e.code === 'ArrowUp' || e.code === 'KeyS' || e.code === 'KeyW' || e.code === 'ArrowDown' || e.code === 'Space') {
+			// 	e.preventDefault();
+			// 	this.fireBullet();
+			// }
+
+			if (e.code === 'KeyR') {
+				this.reset();
+			}
+		});
+
+		document.addEventListener('keyup', (e) => {
+			this.keys[e.code] = false;
+		});
 	}
 
 	handleInput() {
@@ -328,9 +315,8 @@ class Game {
 		// Check bullet-parachutist collisions
 		for (const bullet of this.bullets) {
 			if(!bullet?.on) { continue; }
-
-		for (const p of this.parachutists) {
-			if(!p?.on) { continue; }
+			for (const p of this.parachutists) {
+				if(!p?.on) { continue; }
 				if (bullet.x >= p.x && bullet.x <= p.x + p.width &&
 					bullet.y >= p.y && bullet.y <= p.y + p.height) {
 
@@ -433,30 +419,33 @@ class Game {
 		ctx.fill();
 	}
 
-	drawHelicopter(helicopter) {
+	drawHelicopter(h) {
 		const {ctx} = this
-		const x = Math.floor(helicopter.x);
-		const y = Math.floor(helicopter.y);
+		const x = Math.floor(h.x);
+		const y = Math.floor(h.y);
+
+		let dir = h.vx > 0 ? -1 : 1
 
 		// Helicopter body (pixel art style)
-		ctx.fillStyle = '#666';
-		ctx.fillRect(x + 5, y + 8, 30, 8);
+		ctx.fillStyle = '#000';
+		ctx.fillRect(x + 5 * dir, y + 8, 30 * dir, 8);
+		ctx.fillRect(x + 22 * dir, y, 2, 10);
 
 		// Cockpit
-		ctx.fillStyle = '#444';
-		ctx.fillRect(x + 8, y + 5, 12, 8);
+		ctx.fillStyle = '#202020';
+		ctx.fillRect(x + 8 * dir, y + 5, 12 * dir, 6);
 
 		// Rotor
-		ctx.fillStyle = '#333';
-		ctx.fillRect(x, y, 40, 2);
+		ctx.fillStyle = 'rgba(0,0,0,.25)';
+		ctx.fillRect(x, y, 40 * dir, 2);
 
 		// Tail
-		ctx.fillStyle = '#666';
-		ctx.fillRect(x + 32, y + 10, 8, 3);
+		ctx.fillStyle = '#000';
+		ctx.fillRect(x + 32 * dir, y + 10, 8 * dir, 3);
 
 		// Tail rotor
-		ctx.fillStyle = '#333';
-		ctx.fillRect(x + 38, y + 8, 2, 8);
+		ctx.fillStyle = 'rgba(0,0,0,.25)';
+		ctx.fillRect(x + 38 * dir, y + 8, 2 * dir, 8);
 	}
 
 	drawParachutist(p) {
@@ -501,15 +490,26 @@ class Game {
 		this.ctx.fillText(`${this.score}`, 10, this.groundLevel + 30);
 	}
 
-	gameLoop() {
-		this.update();
-		this.render();
-		requestAnimationFrame(() => this.gameLoop());
+	scaleScreen(smooth=true) {
+		const {canvas, ctx, width, height} = this
+		var scale = window.devicePixelRatio || 1;
+		var container = canvas.parentNode.getBoundingClientRect();
+		var zoom = Math.min(
+			(container.height / height),
+			(container.width / width),
+		);
+		var zoomScale = zoom * scale;
+		canvas.style.height = `${height * zoom}px`;
+		canvas.style.width = `${width * zoom}px`;
+		if(smooth){
+			canvas.height = height * zoomScale;
+			canvas.width = width * zoomScale;
+			ctx.scale(zoomScale, zoomScale);
+		}
 	}
+
 }
 
-// Start the game when page loads
-window.addEventListener('load', () => {
-	new Game();
-});
+// Start the game
+new Game();
 </script>
