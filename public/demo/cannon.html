@@ -12,7 +12,6 @@ body {
 	font-family: 'Roboto Mono', 'Consolas', monospace;
 	line-height: 1.5;
 	margin: 0;
-	overflow: hidden;
 	padding: 0;
 }
 #gameContainer {
@@ -34,25 +33,9 @@ canvas {
 	font-size: 12px;
 	text-shadow: 1px 1px 0px #000;
 }
-#gameOver {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	color: #ff0000;
-	font-size: 24px;
-	font-weight: bold;
-	text-shadow: 2px 2px 0px #000;
-	display: none;
-	text-align: center;
-}
 </style>
 <div id="gameContainer">
 <canvas id="gameCanvas" width="640" height="480"></canvas>
-<div id="gameOver">
-	<div>Game Over</div>
-	<div style="font-size: 16px; margin-top: 10px;">[R]estart</div>
-</div>
 <script>
 const TAU = 2 * Math.PI;
 class Game {
@@ -69,13 +52,11 @@ class Game {
 	constructor() {
 		this.canvas = document.getElementById('gameCanvas');
 		this.ctx = this.canvas.getContext('2d');
-		this.gameOverDiv = document.getElementById('gameOver');
 		this.width = this.canvas.width
 		this.height = this.canvas.height
 
 		// Game state
 		this.score = 0;
-		this.gameRunning = true;
 		this.groundLevel = this.height - 80;
 
 		// Cannon properties
@@ -91,24 +72,16 @@ class Game {
 
 		this.reset();
 		// Start game loop
-		this.RAF = new RAF(this.gameLoop, this);
-		this.RAF.next();
-	}
-
-	gameLoop() {
-		this.update();
-		this.render();
-		this.RAF.next();
+		this.frame = new FrameLimiter(this.gameLoop, this);
+		this.frame.next();
 	}
 
 	reset() {
 		this.scaleScreen();
 		this.score = 0;
-		this.gameRunning = true;
 		this.helicopterSpawnDelay = 0
 		this.helicopterSpawnTimer = this.helicopterSpawnDelay;
 		this.cannon.angle = -.25 * TAU;
-		this.gameOverDiv.style.display = 'none';
 		// Game objects
 		this.bullets = Array(Game.MAX_BULLETS);
 		this.debris = Array(Game.MAX_DEBRIS);
@@ -116,8 +89,13 @@ class Game {
 		this.parachutists = Array(Game.MAX_PARACHUTISTS);
 	}
 
+	gameLoop() {
+		this.update();
+		this.render();
+		this.frame.next();
+	}
+
 	update() {
-		if (!this.gameRunning) return;
 		this.bullet_timer = (this.bullet_timer + 1) % 12;
 		this.handleInput();
 		this.updateBullets();
@@ -126,7 +104,7 @@ class Game {
 		this.updateDebris();
 		this.spawnHelicopters();
 		this.checkCollisions();
-		this.checkGameOver();
+		// this.checkGameOver();
 		this.bullet_timer || this.fireBullet();
 	}
 
@@ -139,6 +117,9 @@ class Game {
 			// 	this.fireBullet();
 			// }
 
+			if (e.code === 'KeyP') {
+				this.frame.pause();
+			}
 			if (e.code === 'KeyR') {
 				this.reset();
 			}
@@ -162,7 +143,6 @@ class Game {
 	}
 
 	fireBullet() {
-		if (!this.gameRunning) return;
 		// Cost 1 point per bullet
 		this.score -= 1;
 		const speed = 9;
@@ -348,13 +328,6 @@ class Game {
 		}
 	}
 
-	checkGameOver() {
-		// Game over is handled when parachutist reaches ground
-		if (!this.gameRunning) {
-			this.gameOverDiv.style.display = 'block';
-		}
-	}
-
 	render() {
 		const {ctx} = this
 		// Clear canvas
@@ -509,26 +482,36 @@ class Game {
 	}
 }
 
-// Frame Limiter
-class RAF {
+class FrameLimiter {
 	constructor(fn, instance){
-		this.fn = fn.bind(instance)
-		this.t0 = 0
 		// 16.67ms @ 60Hz
 		// <10ms so Firefox doesn't get lazy
 		// 8.33ms @ 120Hz
 		this.ms = 9.5
-		this.next = this.step.bind(this)
+		this.fn = fn.bind(instance)
+		this.next = this.main.bind(this)
+		this.reqFrame = null
+		this.on = true
+		this.t0 = 0
 	}
-	step(){
+	// .next() to request another frame
+	main(){
 		let t1 = performance.now()
 		if((t1 - this.t0) > this.ms){
 			this.t0 = t1
-			requestAnimationFrame(this.fn)
+			this.reqFrame = requestAnimationFrame(this.fn)
 		}
 		else {
-			requestAnimationFrame(this.next)
+			this.reqFrame = requestAnimationFrame(this.next)
 		}
+	}
+	pause() {
+		this.on = !this.on
+		this.on ? this.start() : this.stop()
+	}
+	start(){ this.on && this.next() }
+	stop(){
+		this.reqFrame && cancelAnimationFrame(this.reqFrame)
 	}
 }
 
