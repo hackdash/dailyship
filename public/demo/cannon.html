@@ -90,15 +90,15 @@ class Game {
 		this.addEventListeners();
 
 		this.reset();
-
 		// Start game loop
-		this.gameLoop();
+		this.RAF = new RAF(this.gameLoop, this);
+		this.RAF.next();
 	}
 
 	gameLoop() {
 		this.update();
 		this.render();
-		requestAnimationFrame(() => this.gameLoop());
+		this.RAF.next();
 	}
 
 	reset() {
@@ -507,9 +507,33 @@ class Game {
 			ctx.scale(zoomScale, zoomScale);
 		}
 	}
+}
 
+// Frame Limiter
+class RAF {
+	constructor(fn, instance){
+		this.fn = fn.bind(instance)
+		this.t0 = 0
+		// 16.67ms @ 60Hz
+		// <10ms so Firefox doesn't get lazy
+		// 8.33ms @ 120Hz
+		this.ms = 9.5
+		this.next = this.step.bind(this)
+	}
+	step(){
+		let t1 = performance.now()
+		if((t1 - this.t0) > this.ms){
+			this.t0 = t1
+			requestAnimationFrame(this.fn)
+		}
+		else {
+			requestAnimationFrame(this.next)
+		}
+	}
 }
 
 // Start the game
 new Game();
+
+
 </script>
