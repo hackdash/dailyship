@@ -12,18 +12,18 @@ body {
 	font-family: 'Roboto Mono', 'Consolas', monospace;
 	line-height: 1.5;
 	margin: 0;
+	overflow: hidden;
 	padding: 0;
 }
 #gameContainer {
 	min-height: 100vh;
 }
-canvas {
-	display: block;
+#gameCanvas {
+	position: absolute;
 	background: linear-gradient(to bottom, #203440 0%, #203440 70%);
 	image-rendering: pixelated;
 	image-rendering: -moz-crisp-edges;
 	image-rendering: crisp-edges;
-	margin: auto;
 }
 #instructions {
 	position: absolute;
@@ -37,7 +37,10 @@ canvas {
 <div id="gameContainer">
 <canvas id="gameCanvas" width="640" height="480"></canvas>
 <script>
+const {abs, cos, floor, max, min, random, sin} = Math
 const TAU = 2 * Math.PI;
+const TAU_2 = TAU / 2
+const TAU_4 = TAU / 4
 class Game {
 	static GRAVITY = 0.1;
 	static MAX_BULLETS = 32;
@@ -59,11 +62,10 @@ class Game {
 		this.score = 0;
 		this.groundLevel = this.height - 80;
 
-		// Cannon properties
 		this.cannon = {
 			x: this.width / 2,
 			y: this.groundLevel,
-			length: 30
+			length: 30,
 		};
 
 		// Input handling
@@ -71,7 +73,6 @@ class Game {
 		this.addEventListeners();
 
 		this.reset();
-		// Start game loop
 		this.frame = new FrameLimiter(this.gameLoop, this);
 		this.frame.next();
 	}
@@ -81,7 +82,7 @@ class Game {
 		this.score = 0;
 		this.helicopterSpawnDelay = 0
 		this.helicopterSpawnTimer = this.helicopterSpawnDelay;
-		this.cannon.angle = -.25 * TAU;
+		this.cannon.angle = -TAU_4;
 		// Game objects
 		this.bullets = Array(Game.MAX_BULLETS);
 		this.debris = Array(Game.MAX_DEBRIS);
@@ -111,14 +112,14 @@ class Game {
 	addEventListeners() {
 		document.addEventListener('keydown', (e) => {
 			this.keys[e.code] = true;
-
 			// if (e.code === 'ArrowUp' || e.code === 'KeyS' || e.code === 'KeyW' || e.code === 'ArrowDown' || e.code === 'Space') {
 			// 	e.preventDefault();
 			// 	this.fireBullet();
 			// }
-
 			if (e.code === 'KeyP') {
 				this.frame.pause();
+				this.scaleScreen();
+				this.render();
 			}
 			if (e.code === 'KeyR') {
 				this.reset();
@@ -134,11 +135,11 @@ class Game {
 		// Rotate cannon
 		if (this.keys['KeyA'] || this.keys['ArrowLeft']) {
 			this.cannon.angle -= 0.03;
-			this.cannon.angle = Math.max(this.cannon.angle, 0.1 - TAU/2);
+			this.cannon.angle = max(this.cannon.angle, 0.1 - TAU/2);
 		}
 		if (this.keys['KeyD'] || this.keys['ArrowRight']) {
 			this.cannon.angle += 0.03;
-			this.cannon.angle = Math.min(this.cannon.angle, -0.1);
+			this.cannon.angle = min(this.cannon.angle, -0.1);
 		}
 	}
 
@@ -149,10 +150,10 @@ class Game {
 		const bullet = this.bullets[this.bullet] ??= {}
 		this.bullet = (this.bullet + 1) % Game.MAX_BULLETS
 		bullet.on = true
-		bullet.vx = Math.cos(this.cannon.angle) * speed
-		bullet.vy = Math.sin(this.cannon.angle) * speed
-		bullet.x = this.cannon.x + Math.cos(this.cannon.angle) * this.cannon.length
-		bullet.y = this.cannon.y + Math.sin(this.cannon.angle) * this.cannon.length
+		bullet.vx = cos(this.cannon.angle) * speed
+		bullet.vy = sin(this.cannon.angle) * speed
+		bullet.x = this.cannon.x + cos(this.cannon.angle) * this.cannon.length
+		bullet.y = this.cannon.y + sin(this.cannon.angle) * this.cannon.length
 	}
 
 	updateBullets() {
@@ -176,18 +177,18 @@ class Game {
 		if (this.helicopterSpawnTimer >= this.helicopterSpawnDelay) {
 			this.helicopterSpawnTimer = 0;
 			// Random spawn delay
-			this.helicopterSpawnDelay = 30 //+ 30 * Math.random();
-			const side = Math.random() < 0.5 ? 'left' : 'right';
+			this.helicopterSpawnDelay = 30 //+ 30 * random();
+			const side = random() < 0.5 ? 'left' : 'right';
 			const h = this.helicopters[this.helicopter] ??= {}
 			this.helicopter = (this.helicopter + 1) % Game.MAX_HELICOPTERS
 			h.on = true
 			h.x = side === 'left' ? -50 : this.width + 50
-			h.y = 50 + Math.random() * 150
-			h.vx = side === 'left' ? 1 + Math.random() : -(1 + Math.random())
+			h.y = 50 + random() * 150
+			h.vx = side === 'left' ? 1 + random() : -(1 + random())
 			h.width = 40
 			h.height = 20
-			h.dropTimer = 30 + 60 * Math.random()
-			h.maxDropTimer = 30 + 60 * Math.random()
+			h.dropTimer = 30 + 60 * random()
+			h.maxDropTimer = 30 + 60 * random()
 		}
 	}
 
@@ -220,7 +221,7 @@ class Game {
 		p.width = 8
 		p.height = 12
 		p.parachuteOpen = false
-		p.parachuteTimer = 30 + 10 * Math.random()
+		p.parachuteTimer = 30 + 10 * random()
 	}
 
 	updateParachutists() {
@@ -263,7 +264,7 @@ class Game {
 			if (d.y >= ground) {
 				d.y = ground
 				d.vy = d.vy * -0.7;
-				if(Math.abs(d.vy) < .01){ d.vy = 0; }
+				if(abs(d.vy) < .01){ d.vy = 0; }
 				d.vx *= 0.9;
 			}
 		}
@@ -320,10 +321,10 @@ class Game {
 			const d = this.debris[this.debris_index] ??= {}
 			this.debris_index = (this.debris_index + 1) % Game.MAX_DEBRIS
 			d.on = true
-			d.x = x + (Math.random() - 0.5) * 20,
-			d.y = y + (Math.random() - 0.5) * 20,
-			d.vx = (Math.random() - 0.5) * 6,
-			d.vy = (Math.random() - 0.5) * 6 - 2,
+			d.x = x + (random() - 0.5) * 20,
+			d.y = y + (random() - 0.5) * 20,
+			d.vx = (random() - 0.5) * 6,
+			d.vy = (random() - 0.5) * 6 - 2,
 			d.color = color
 		}
 	}
@@ -344,9 +345,9 @@ class Game {
 		ctx.fillStyle = '#F09000';
 		for (const bullet of this.bullets) {
 			if(!bullet?.on) { continue; }
-			// ctx.fillRect(Math.floor(bullet.x), Math.floor(bullet.y), 4, 4);
+			// ctx.fillRect(floor(bullet.x), floor(bullet.y), 4, 4);
 			ctx.beginPath();
-			ctx.ellipse(Math.floor(bullet.x), Math.floor(bullet.y), 2, 2, 0, 0, TAU);
+			ctx.ellipse(floor(bullet.x), floor(bullet.y), 2, 2, 0, 0, TAU);
 			ctx.fill();
 		}
 
@@ -364,7 +365,7 @@ class Game {
 		for (const d of this.debris) {
 			if (d?.on) {
 				ctx.fillStyle = d.color;
-				ctx.fillRect(Math.floor(d.x), Math.floor(d.y), 1, 1);
+				ctx.fillRect(floor(d.x), floor(d.y), 1, 1);
 			}
 		}
 
@@ -379,8 +380,8 @@ class Game {
 		ctx.beginPath();
 		ctx.moveTo(this.cannon.x, this.cannon.y);
 		ctx.lineTo(
-			this.cannon.x + Math.cos(this.cannon.angle) * this.cannon.length,
-			this.cannon.y + Math.sin(this.cannon.angle) * this.cannon.length
+			this.cannon.x + cos(this.cannon.angle) * this.cannon.length,
+			this.cannon.y + sin(this.cannon.angle) * this.cannon.length
 		);
 		ctx.stroke();
 
@@ -388,14 +389,14 @@ class Game {
 		ctx.fillStyle = '#B5A642';
 		// ctx.fillRect(this.cannon.x - 8, this.cannon.y - 4, 16, 8);
 		ctx.beginPath();
-		ctx.ellipse(this.cannon.x, this.cannon.y + 4, 12, 12, 0, 0.5*TAU, 0);
+		ctx.ellipse(this.cannon.x, this.cannon.y + 4, 12, 12, 0, TAU_2, 0);
 		ctx.fill();
 	}
 
 	drawHelicopter(h) {
 		const {ctx} = this
-		const x = Math.floor(h.x);
-		const y = Math.floor(h.y);
+		const x = floor(h.x);
+		const y = floor(h.y);
 
 		let dir = h.vx > 0 ? -1 : 1
 
@@ -423,8 +424,8 @@ class Game {
 
 	drawParachutist(p) {
 		const {ctx} = this
-		const x = Math.floor(p.x);
-		const y = Math.floor(p.y);
+		const x = floor(p.x);
+		const y = floor(p.y);
 
 		if (p.parachuteOpen) {
 			// Parachute
@@ -467,16 +468,17 @@ class Game {
 		const {canvas, ctx, width, height} = this
 		var scale = window.devicePixelRatio || 1;
 		var container = canvas.parentNode.getBoundingClientRect();
-		var zoom = Math.min(
+		var zoom = min(
 			(container.height / height),
 			(container.width / width),
 		);
 		var zoomScale = zoom * scale;
-		canvas.style.height = `${height * zoom}px`;
-		canvas.style.width = `${width * zoom}px`;
+		canvas.style.left = `${floor((container.width - (width * zoom))/2)}px`;
+		canvas.style.height = `${floor(height * zoom)}px`;
+		canvas.style.width = `${floor(width * zoom)}px`;
 		if(smooth){
-			canvas.height = height * zoomScale;
-			canvas.width = width * zoomScale;
+			canvas.height = floor(height * zoomScale);
+			canvas.width = floor(width * zoomScale);
 			ctx.scale(zoomScale, zoomScale);
 		}
 	}
@@ -516,7 +518,5 @@ class FrameLimiter {
 }
 
 // Start the game
-new Game();
-
-
+let game = new Game();
 </script>
