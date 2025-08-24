@@ -28,115 +28,115 @@ body {
 <canvas id="gameCanvas" width="640" height="480"></canvas>
 <script>
 const {abs, cos, floor, max, min, random, sin} = Math
-const TAU = 2 * Math.PI;
+const TAU = 2 * Math.PI
 const TAU_2 = TAU / 2
 const TAU_4 = TAU / 4
 class Game {
-	static GRAVITY = 0.1;
-	static MAX_BULLETS = 32;
-	static MAX_DEBRIS = 256;
-	static MAX_HELICOPTERS = 16;
-	static MAX_PARACHUTISTS = 32;
-	bullet = 0;
-	debris_index = 0;
-	helicopter = 0;
-	parachutist = 0;
-	bullet_timer = 0;
-	constructor() {
-		this.canvas = document.getElementById('gameCanvas');
-		this.ctx = this.canvas.getContext('2d');
+	static GRAVITY = 0.1
+	static MAX_BULLETS = 32
+	static MAX_DEBRIS = 256
+	static MAX_HELICOPTERS = 16
+	static MAX_PARACHUTISTS = 32
+	bullet = 0
+	debris_index = 0
+	helicopter = 0
+	parachutist = 0
+	bullet_timer = 0
+	constructor(){
+		this.canvas = document.getElementById('gameCanvas')
+		this.ctx = this.canvas.getContext('2d')
 		this.width = this.canvas.width
 		this.height = this.canvas.height
 
 		// Game state
-		this.score = 0;
-		this.groundLevel = this.height - 80;
+		this.score = 0
+		this.groundLevel = this.height - 80
 
 		this.cannon = {
 			x: this.width / 2,
 			y: this.groundLevel,
 			length: 30,
-		};
+		}
 
 		// Input handling
-		this.keys = {};
-		this.addEventListeners();
+		this.keys = {}
+		this.addEventListeners()
 
-		this.reset();
-		this.frame = new FrameLimiter(this.gameLoop, this);
-		this.frame.next();
+		this.reset()
+		this.frame = new FrameLimiter(this.gameLoop, this)
+		this.frame.next()
 	}
 
-	reset() {
-		this.scaleScreen();
-		this.score = 0;
+	reset(){
+		this.scaleScreen()
+		this.score = 0
 		this.helicopterSpawnDelay = 0
-		this.helicopterSpawnTimer = this.helicopterSpawnDelay;
-		this.cannon.angle = -TAU_4;
+		this.helicopterSpawnTimer = this.helicopterSpawnDelay
+		this.cannon.angle = -TAU_4
 		// Game objects
-		this.bullets = Array(Game.MAX_BULLETS);
-		this.debris = Array(Game.MAX_DEBRIS);
-		this.helicopters = Array(Game.MAX_HELICOPTERS);
-		this.parachutists = Array(Game.MAX_PARACHUTISTS);
+		this.bullets = Array(Game.MAX_BULLETS)
+		this.debris = Array(Game.MAX_DEBRIS)
+		this.helicopters = Array(Game.MAX_HELICOPTERS)
+		this.parachutists = Array(Game.MAX_PARACHUTISTS)
 	}
 
-	gameLoop() {
-		this.update();
-		this.render();
-		this.frame.next();
+	gameLoop(){
+		this.update()
+		this.render()
+		this.frame.next()
 	}
 
-	update() {
-		this.bullet_timer = (this.bullet_timer + 1) % 12;
-		this.handleInput();
-		this.updateBullets();
-		this.updateHelicopters();
-		this.updateParachutists();
-		this.updateDebris();
-		this.spawnHelicopters();
-		this.checkCollisions();
-		// this.checkGameOver();
-		this.bullet_timer || this.fireBullet();
+	update(){
+		this.bullet_timer = (this.bullet_timer + 1) % 12
+		this.handleInput()
+		this.updateBullets()
+		this.updateHelicopters()
+		this.updateParachutists()
+		this.updateDebris()
+		this.spawnHelicopters()
+		this.checkCollisions()
+		// this.checkGameOver()
+		this.bullet_timer || this.fireBullet()
 	}
 
-	addEventListeners() {
+	addEventListeners(){
 		document.addEventListener('keydown', (e) => {
-			this.keys[e.code] = true;
-			// if (e.code === 'ArrowUp' || e.code === 'KeyS' || e.code === 'KeyW' || e.code === 'ArrowDown' || e.code === 'Space') {
-			// 	e.preventDefault();
-			// 	this.fireBullet();
+			this.keys[e.code] = true
+			// if(e.code === 'ArrowUp' || e.code === 'KeyS' || e.code === 'KeyW' || e.code === 'ArrowDown' || e.code === 'Space'){
+			// 	e.preventDefault()
+			// 	this.fireBullet()
 			// }
-			if (e.code === 'KeyP') {
-				this.frame.pause();
-				this.scaleScreen();
-				this.render();
+			if(e.code === 'KeyP'){
+				this.frame.pause()
+				this.scaleScreen()
+				this.render()
 			}
-			if (e.code === 'KeyR') {
-				this.reset();
+			else if(e.code === 'KeyR'){
+				this.reset()
 			}
-		});
+		})
 
 		document.addEventListener('keyup', (e) => {
-			this.keys[e.code] = false;
-		});
+			this.keys[e.code] = false
+		})
 	}
 
-	handleInput() {
+	handleInput(){
 		// Rotate cannon
-		if (this.keys['KeyA'] || this.keys['ArrowLeft']) {
-			this.cannon.angle -= 0.03;
-			this.cannon.angle = max(this.cannon.angle, 0.1 - TAU/2);
+		if(this.keys['KeyA'] || this.keys['ArrowLeft']){
+			this.cannon.angle -= 0.03
+			this.cannon.angle = max(this.cannon.angle, 0.1 - TAU/2)
 		}
-		if (this.keys['KeyD'] || this.keys['ArrowRight']) {
-			this.cannon.angle += 0.03;
-			this.cannon.angle = min(this.cannon.angle, -0.1);
+		if(this.keys['KeyD'] || this.keys['ArrowRight']){
+			this.cannon.angle += 0.03
+			this.cannon.angle = min(this.cannon.angle, -0.1)
 		}
 	}
 
-	fireBullet() {
+	fireBullet(){
 		// Cost 1 point per bullet
-		this.score -= 1;
-		const speed = 9;
+		this.score -= 1
+		const speed = 9
 		const bullet = this.bullets[this.bullet] ??= {}
 		this.bullet = (this.bullet + 1) % Game.MAX_BULLETS
 		bullet.on = true
@@ -146,29 +146,29 @@ class Game {
 		bullet.y = this.cannon.y + sin(this.cannon.angle) * this.cannon.length
 	}
 
-	updateBullets() {
-		for (const bullet of this.bullets) {
-			if(!bullet?.on) { continue; }
-			bullet.x += bullet.vx;
-			bullet.y += bullet.vy;
-			bullet.vy += Game.GRAVITY;
-			if (
+	updateBullets(){
+		for (const bullet of this.bullets){
+			if(!bullet?.on){ continue }
+			bullet.x += bullet.vx
+			bullet.y += bullet.vy
+			bullet.vy += Game.GRAVITY
+			if(
 				bullet.x < 0
 				|| bullet.x > this.width
 				|| bullet.y > this.groundLevel
-			) {
-				bullet.on = false;
-			};
+			){
+				bullet.on = false
+			}
 		}
 	}
 
-	spawnHelicopters() {
-		this.helicopterSpawnTimer += 1;
-		if (this.helicopterSpawnTimer >= this.helicopterSpawnDelay) {
-			this.helicopterSpawnTimer = 0;
+	spawnHelicopters(){
+		this.helicopterSpawnTimer += 1
+		if(this.helicopterSpawnTimer >= this.helicopterSpawnDelay){
+			this.helicopterSpawnTimer = 0
 			// Random spawn delay
-			this.helicopterSpawnDelay = 30 //+ 30 * random();
-			const side = random() < 0.5 ? 'left' : 'right';
+			this.helicopterSpawnDelay = 30 //+ 30 * random()
+			const side = random() < 0.5 ? 'left' : 'right'
 			const h = this.helicopters[this.helicopter] ??= {}
 			this.helicopter = (this.helicopter + 1) % Game.MAX_HELICOPTERS
 			h.on = true
@@ -182,25 +182,25 @@ class Game {
 		}
 	}
 
-	updateHelicopters() {
-		for (const h of this.helicopters) {
-			if(!h?.on) { continue; }
-			h.x += h.vx;
-			h.dropTimer -= 1;
+	updateHelicopters(){
+		for (const h of this.helicopters){
+			if(!h?.on){ continue }
+			h.x += h.vx
+			h.dropTimer -= 1
 
 			// Drop parachutist
-			if (h.dropTimer <= 0) {
-				h.dropTimer = h.maxDropTimer;
-				this.spawnParachutist(h.x, h.y + h.height, h.vx);
+			if(h.dropTimer <= 0){
+				h.dropTimer = h.maxDropTimer
+				this.spawnParachutist(h.x, h.y + h.height, h.vx)
 			}
 
-			if (h.x < -100 || h.x > this.width + 100) {
-				h.on = false;
-			};
+			if(h.x < -100 || h.x > this.width + 100){
+				h.on = false
+			}
 		}
 	}
 
-	spawnParachutist(x, y, vx) {
+	spawnParachutist(x, y, vx){
 		const p = this.parachutists[this.parachutist] ??= {}
 		this.parachutist = (this.parachutist + 1) % Game.MAX_PARACHUTISTS
 		p.on = true
@@ -214,100 +214,100 @@ class Game {
 		p.parachuteTimer = 30 + 10 * random()
 	}
 
-	updateParachutists() {
-		for (const p of this.parachutists) {
-			if(!p?.on) { continue; }
-			p.x += p.vx;
-			p.y += p.vy;
+	updateParachutists(){
+		for (const p of this.parachutists){
+			if(!p?.on){ continue }
+			p.x += p.vx
+			p.y += p.vy
 			!p.parachuteOpen && (p.vy += Game.GRAVITY)
-			if (p.parachuteOpen) {
-				p.parachuteTimer -= 1;
-				if (p.parachuteTimer <= 0) {
-					p.parachuteOpen = true;
+			if(p.parachuteOpen){
+				p.parachuteTimer -= 1
+				if(p.parachuteTimer <= 0){
+					p.parachuteOpen = true
 					p.vy *= 0.5
 				}
 			}
 			else {
 				// Open parachute after timer
-				p.parachuteTimer -= 1;
-				(p.parachuteTimer <= 0) && (p.parachuteOpen = true);
+				p.parachuteTimer -= 1
+				;(p.parachuteTimer <= 0) && (p.parachuteOpen = true)
 			}
 
 			// Check if reached ground
-			if (p.y >= this.groundLevel - p.height) {
+			if(p.y >= this.groundLevel - p.height){
 				// Lose point if parachutist reaches ground
-				this.score -= 10;
-				p.on = false;
+				this.score -= 10
+				p.on = false
 			}
 		}
 	}
 
-	updateDebris() {
+	updateDebris(){
 		const ground = this.groundLevel
-		for ( const d of this.debris) {
-			if(!d?.on) { continue; }
-			d.vy += Game.GRAVITY;
-			d.x += d.vx;
-			d.y += d.vy;
+		for ( const d of this.debris){
+			if(!d?.on){ continue }
+			d.vy += Game.GRAVITY
+			d.x += d.vx
+			d.y += d.vy
 
 			// Bounce off ground
-			if (d.y >= ground) {
+			if(d.y >= ground){
 				d.y = ground
-				d.vy = d.vy * -0.7;
-				if(abs(d.vy) < .01){ d.vy = 0; }
-				d.vx *= 0.9;
+				d.vy = d.vy * -0.7
+				if(abs(d.vy) < .01){ d.vy = 0 }
+				d.vx *= 0.9
 			}
 		}
 	}
 
-	checkCollisions() {
+	checkCollisions(){
 		// Check bullet-helicopter collisions
-		for (const bullet of this.bullets) {
-			if(!bullet?.on) { continue; }
-			for (const helicopter of this.helicopters) {
-				if(!helicopter?.on) { continue; }
-				if (bullet.x >= helicopter.x && bullet.x <= helicopter.x + helicopter.width &&
-					bullet.y >= helicopter.y && bullet.y <= helicopter.y + helicopter.height) {
+		for (const bullet of this.bullets){
+			if(!bullet?.on){ continue }
+			for (const helicopter of this.helicopters){
+				if(!helicopter?.on){ continue }
+				if(bullet.x >= helicopter.x && bullet.x <= helicopter.x + helicopter.width &&
+					bullet.y >= helicopter.y && bullet.y <= helicopter.y + helicopter.height){
 
 					// Create debris
-					this.createDebris(helicopter.x + helicopter.width/2, helicopter.y + helicopter.height/2, '#F08040', 15);
+					this.createDebris(helicopter.x + helicopter.width/2, helicopter.y + helicopter.height/2, '#F08040', 15)
 
 					// Award points
-					this.score += 50;
+					this.score += 50
 
 					// Remove bullet and helicopter
-					bullet.on = false;
-					helicopter.on = false;
-					break;
+					bullet.on = false
+					helicopter.on = false
+					break
 				}
 			}
 		}
 
 		// Check bullet-parachutist collisions
-		for (const bullet of this.bullets) {
-			if(!bullet?.on) { continue; }
-			for (const p of this.parachutists) {
-				if(!p?.on) { continue; }
-				if (bullet.x >= p.x && bullet.x <= p.x + p.width &&
-					bullet.y >= p.y && bullet.y <= p.y + p.height) {
+		for (const bullet of this.bullets){
+			if(!bullet?.on){ continue }
+			for (const p of this.parachutists){
+				if(!p?.on){ continue }
+				if(bullet.x >= p.x && bullet.x <= p.x + p.width &&
+					bullet.y >= p.y && bullet.y <= p.y + p.height){
 
 					// Create debris
-					this.createDebris(p.x + p.width/2, p.y + p.height/2, '#FF0000', 8);
+					this.createDebris(p.x + p.width/2, p.y + p.height/2, '#FF0000', 8)
 
 					// Award points
-					this.score += 20;
+					this.score += 20
 
 					// Remove bullet and parachutist
-					bullet.on = false;
-					p.on = false;
-					break;
+					bullet.on = false
+					p.on = false
+					break
 				}
 			}
 		}
 	}
 
-	createDebris(x, y, color, count) {
-		for (let i = 0; i < count; ++i) {
+	createDebris(x, y, color, count){
+		for (let i = 0; i < count; ++i){
 			const d = this.debris[this.debris_index] ??= {}
 			this.debris_index = (this.debris_index + 1) % Game.MAX_DEBRIS
 			d.on = true
@@ -319,157 +319,157 @@ class Game {
 		}
 	}
 
-	render() {
+	render(){
 		const {ctx} = this
 		// Clear canvas
-		ctx.clearRect(0, 0, this.width, this.height);
+		ctx.clearRect(0, 0, this.width, this.height)
 
 		// Draw ground
-		ctx.fillStyle = '#202010';
-		ctx.fillRect(0, this.groundLevel, this.width, this.height - this.groundLevel);
+		ctx.fillStyle = '#202010'
+		ctx.fillRect(0, this.groundLevel, this.width, this.height - this.groundLevel)
 
 		// Draw cannon
-		this.drawCannon();
+		this.drawCannon()
 
 		// Draw bullets
-		ctx.fillStyle = '#F09000';
-		for (const bullet of this.bullets) {
-			if(!bullet?.on) { continue; }
-			// ctx.fillRect(floor(bullet.x), floor(bullet.y), 4, 4);
-			ctx.beginPath();
-			ctx.ellipse(floor(bullet.x), floor(bullet.y), 2, 2, 0, 0, TAU);
-			ctx.fill();
+		ctx.fillStyle = '#F09000'
+		for (const bullet of this.bullets){
+			if(!bullet?.on){ continue }
+			// ctx.fillRect(floor(bullet.x), floor(bullet.y), 4, 4)
+			ctx.beginPath()
+			ctx.ellipse(floor(bullet.x), floor(bullet.y), 2, 2, 0, 0, TAU)
+			ctx.fill()
 		}
 
 		// Draw helicopters
-		for (const h of this.helicopters) {
-			h?.on && this.drawHelicopter(h);
+		for (const h of this.helicopters){
+			h?.on && this.drawHelicopter(h)
 		}
 
 		// Draw parachutists
-		for (const p of this.parachutists) {
-			p?.on && this.drawParachutist(p);
+		for (const p of this.parachutists){
+			p?.on && this.drawParachutist(p)
 		}
 
 		// Draw debris
-		for (const d of this.debris) {
-			if (d?.on) {
-				ctx.fillStyle = d.color;
-				ctx.fillRect(floor(d.x), floor(d.y), 1, 1);
+		for (const d of this.debris){
+			if(d?.on){
+				ctx.fillStyle = d.color
+				ctx.fillRect(floor(d.x), floor(d.y), 1, 1)
 			}
 		}
 
 		// Draw score
-		this.drawScore();
+		this.drawScore()
 	}
 
-	drawCannon() {
+	drawCannon(){
 		const {ctx} = this
-		ctx.strokeStyle = '#B5A642';
-		ctx.lineWidth = 4;
-		ctx.beginPath();
-		ctx.moveTo(this.cannon.x, this.cannon.y);
+		ctx.strokeStyle = '#B5A642'
+		ctx.lineWidth = 4
+		ctx.beginPath()
+		ctx.moveTo(this.cannon.x, this.cannon.y)
 		ctx.lineTo(
 			this.cannon.x + cos(this.cannon.angle) * this.cannon.length,
 			this.cannon.y + sin(this.cannon.angle) * this.cannon.length
-		);
-		ctx.stroke();
+		)
+		ctx.stroke()
 
 		// Cannon base
-		ctx.fillStyle = '#B5A642';
-		// ctx.fillRect(this.cannon.x - 8, this.cannon.y - 4, 16, 8);
-		ctx.beginPath();
-		ctx.ellipse(this.cannon.x, this.cannon.y + 4, 12, 12, 0, TAU_2, 0);
-		ctx.fill();
+		ctx.fillStyle = '#B5A642'
+		// ctx.fillRect(this.cannon.x - 8, this.cannon.y - 4, 16, 8)
+		ctx.beginPath()
+		ctx.ellipse(this.cannon.x, this.cannon.y + 4, 12, 12, 0, TAU_2, 0)
+		ctx.fill()
 	}
 
-	drawHelicopter(h) {
+	drawHelicopter(h){
 		const {ctx} = this
-		const x = floor(h.x);
-		const y = floor(h.y);
+		const x = floor(h.x)
+		const y = floor(h.y)
 
 		let dir = h.vx > 0 ? -1 : 1
 
 		// Helicopter body (pixel art style)
-		ctx.fillStyle = '#000';
-		ctx.fillRect(x + 5 * dir, y + 8, 30 * dir, 8);
-		ctx.fillRect(x + 22 * dir, y, 2, 10);
+		ctx.fillStyle = '#000'
+		ctx.fillRect(x + 5 * dir, y + 8, 30 * dir, 8)
+		ctx.fillRect(x + 22 * dir, y, 2, 10)
 
 		// Cockpit
-		ctx.fillStyle = '#202020';
-		ctx.fillRect(x + 8 * dir, y + 5, 12 * dir, 6);
+		ctx.fillStyle = '#202020'
+		ctx.fillRect(x + 8 * dir, y + 5, 12 * dir, 6)
 
 		// Rotor
-		ctx.fillStyle = 'rgba(0,0,0,.25)';
-		ctx.fillRect(x, y, 40 * dir, 2);
+		ctx.fillStyle = 'rgba(0,0,0,.25)'
+		ctx.fillRect(x, y, 40 * dir, 2)
 
 		// Tail
-		ctx.fillStyle = '#000';
-		ctx.fillRect(x + 32 * dir, y + 10, 8 * dir, 3);
+		ctx.fillStyle = '#000'
+		ctx.fillRect(x + 32 * dir, y + 10, 8 * dir, 3)
 
 		// Tail rotor
-		ctx.fillStyle = 'rgba(0,0,0,.25)';
-		ctx.fillRect(x + 38 * dir, y + 8, 2 * dir, 8);
+		ctx.fillStyle = 'rgba(0,0,0,.25)'
+		ctx.fillRect(x + 38 * dir, y + 8, 2 * dir, 8)
 	}
 
-	drawParachutist(p) {
+	drawParachutist(p){
 		const {ctx} = this
-		const x = floor(p.x);
-		const y = floor(p.y);
+		const x = floor(p.x)
+		const y = floor(p.y)
 
-		if (p.parachuteOpen) {
+		if(p.parachuteOpen){
 			// Parachute
-			ctx.fillStyle = '#444';
-			ctx.beginPath();
-			ctx.ellipse(x+4, y-2, 12, 8, 0, 0, TAU);
-			ctx.fill();
-			ctx.fillStyle = '#555';
-			ctx.beginPath();
-			ctx.ellipse(x+4, y-2, 10, 6, 0, 0, TAU);
-			ctx.fill();
+			ctx.fillStyle = '#444'
+			ctx.beginPath()
+			ctx.ellipse(x+4, y-2, 12, 8, 0, 0, TAU)
+			ctx.fill()
+			ctx.fillStyle = '#555'
+			ctx.beginPath()
+			ctx.ellipse(x+4, y-2, 10, 6, 0, 0, TAU)
+			ctx.fill()
 
 			// Parachute lines
-			ctx.strokeStyle = '#808080';
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.moveTo(x - 4, y + 4);
-			ctx.lineTo(x + 4, y + 8);
-			ctx.moveTo(x + 12, y + 4);
-			ctx.lineTo(x + 4, y + 8);
-			ctx.stroke();
+			ctx.strokeStyle = '#808080'
+			ctx.lineWidth = 1
+			ctx.beginPath()
+			ctx.moveTo(x - 4, y + 4)
+			ctx.lineTo(x + 4, y + 8)
+			ctx.moveTo(x + 12, y + 4)
+			ctx.lineTo(x + 4, y + 8)
+			ctx.stroke()
 		}
 
 		// Parachutist body
-		ctx.fillStyle = '#408000';
-		ctx.fillRect(x + 2, y + 8, 4, 8);
+		ctx.fillStyle = '#408000'
+		ctx.fillRect(x + 2, y + 8, 4, 8)
 
 		// Head
-		ctx.fillStyle = '#FFDBAC';
-		ctx.fillRect(x + 3, y + 6, 2, 2);
+		ctx.fillStyle = '#FFDBAC'
+		ctx.fillRect(x + 3, y + 6, 2, 2)
 	}
 
-	drawScore() {
-		this.ctx.fillStyle = '#808000';
-		this.ctx.font = '20px Courier New, monospace';
-		this.ctx.fillText(`${this.score}`, 10, this.groundLevel + 30);
+	drawScore(){
+		this.ctx.fillStyle = '#808000'
+		this.ctx.font = '20px Courier New, monospace'
+		this.ctx.fillText(`${this.score}`, 10, this.groundLevel + 30)
 	}
 
-	scaleScreen(smooth=true) {
+	scaleScreen(smooth=true){
 		const {canvas, ctx, width, height} = this
-		var scale = window.devicePixelRatio || 1;
-		var container = canvas.parentNode.getBoundingClientRect();
+		var scale = window.devicePixelRatio || 1
+		var container = canvas.parentNode.getBoundingClientRect()
 		var zoom = min(
 			(container.height / height),
 			(container.width / width),
-		);
-		var zoomScale = zoom * scale;
-		canvas.style.left = `${floor((container.width - (width * zoom))/2)}px`;
-		canvas.style.height = `${floor(height * zoom)}px`;
-		canvas.style.width = `${floor(width * zoom)}px`;
+		)
+		var zoomScale = zoom * scale
+		canvas.style.left = `${floor((container.width - (width * zoom))/2)}px`
+		canvas.style.height = `${floor(height * zoom)}px`
+		canvas.style.width = `${floor(width * zoom)}px`
 		if(smooth){
-			canvas.height = floor(height * zoomScale);
-			canvas.width = floor(width * zoomScale);
-			ctx.scale(zoomScale, zoomScale);
+			canvas.height = floor(height * zoomScale)
+			canvas.width = floor(width * zoomScale)
+			ctx.scale(zoomScale, zoomScale)
 		}
 	}
 }
@@ -497,7 +497,7 @@ class FrameLimiter {
 			this.reqFrame = requestAnimationFrame(this.next)
 		}
 	}
-	pause() {
+	pause(){
 		this.on = !this.on
 		this.on ? this.start() : this.stop()
 	}
@@ -508,5 +508,5 @@ class FrameLimiter {
 }
 
 // Start the game
-let game = new Game();
+let game = new Game()
 </script>

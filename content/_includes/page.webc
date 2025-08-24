@@ -7,13 +7,10 @@
 <meta name='description' :content='description||"Ship daily!"'>
 <link href='/style.css' rel='stylesheet'>
 <link :href='getBundleFileUrl("css")' rel='stylesheet' webc:keep>
-<link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚢</text></svg>'>
+<link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚓</text></svg>'>
 <nav class='brb'>
 <ul class='menu row wrap'>
-<li><a href='/'><h1>DailyShip 🚢</h1></a>
-<li><a href='https://qchat.rizon.net/?channels=dailyship'>Chat</a>
-<li class='grow'><a href='https://github.com/hackdash/dailyship'>Code</a>
-<!-- <li class='grow'><a href='/news'>News</a> -->
+<li class='grow'><a href='/'><h1>DailyShip ⚓</h1></a>
 <li><a href='/404.html'>🐙</a>
 </ul>
 </nav>

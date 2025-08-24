@@ -1,11 +1,11 @@
 * {box-sizing:border-box;}
 :root {
 	color-scheme:dark;
-	--buoy: #008080;
-	--moor: #F08040;
+	--buoy:#006060;
+	--moor:#F08040;
 }
 body {
-	background:#002040;
+	background:#001830;
 	color:#F0F0F0;
 	font-family:'Roboto',sans-serif;
 	font-size:16px;
@@ -20,23 +20,24 @@ a:hover {background:#001020;}
 h1 {
 	font-size:2em;
 	font-variant:small-caps;
-	margin:0;
 }
+h1, h2 {margin:0 .5rem;}
 hr, .menu {
 	border-color:var(--buoy);
 	border-style:dotted;
 	border-width:0 0 .5em;
 }
 hr {margin:1em -1em;}
-.brb {margin: 0 0 1.5rem;}
+.brb {margin:0 0 1.5rem;}
 nav a, nav .a {
 	display:block;
 	line-height:2;
-	padding:0 1rem;
+	padding:0 1.5rem;
 }
 nav li {list-style:none;}
 nav ul {padding:0;margin:0 -1rem;}
-p { max-width: 55em; }
+p {max-width:50em;}
+p, pre {margin:.5rem;}
 ul {margin:0;}
 ds-clock {
 	background:rgba(0,0,0,.5);
@@ -54,7 +55,7 @@ ds-clock {
 }
 .blt li::before {
 	background:var(--moor);
-	border-bottom: #FFF .25em solid;
+	border-bottom:#FFF .25em solid;
 	border-radius:.5em .5em .25em .25em;
 	content:'';
 	display:block;
@@ -70,7 +71,7 @@ ds-clock {
 .menu {
 	border-width:0 0 1em;
 }
-.menu a {padding:1.5rem .75rem 0; white-space:nowrap;}
-.menu a h1 {margin-top:-1.5rem;}
+.menu a {padding:1.5rem 1.5rem 0; white-space:nowrap;}
+.menu a h1 {margin:-1.5rem 0 0;}
 .row {display:flex;flex-direction:row;}
-.wrap {flex-wrap: wrap;}
+.wrap {flex-wrap:wrap;}

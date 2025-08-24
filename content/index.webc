@@ -10,11 +10,18 @@ description: Ship projects faster than your competitors!
   </ul>
 </nav>
 <hr>
-<nav class='blt'>
+<nav>
   <ul>
     <li webc:for='post of collections.post.reverse()'>
       <a :href='post.url' @text='post.data.title'></a>
     </li>
+  </ul>
+</nav>
+<hr>
+<nav class='blt'>
+  <ul>
+    <li><a href='https://qchat.rizon.net/?channels=dailyship'>Chat</a>
+    <li class='grow'><a href='https://github.com/hackdash/dailyship'>Code</a>
   </ul>
 </nav>
 <hr>
