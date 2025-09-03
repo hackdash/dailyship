@@ -5,6 +5,7 @@ description: Ship projects faster than your competitors!
 ---
 <nav class='big'>
   <ul>
+    <li><a href='/demo/block/'>Block</a>
     <li><a href='/demo/cannon/'>Cannon</a>
     <li><a href='https://vezquex.github.io/'>Clocks</a>
   </ul>
