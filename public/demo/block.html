@@ -302,7 +302,7 @@ class Block{
 			}
 			// if(this.keyhold[e.code]){ return }
 			// this.keyhold[e.code] = true
-			action && this.input(action)
+			action && this.input(action, e.repeat)
 			if(this.keydown){ return }
 			this.keydown = true
 			document.querySelectorAll('.touch').forEach(
@@ -318,14 +318,14 @@ class Block{
 		window.addEventListener('resize', resize_raf)
 		this.reset()
 	}
-	input(action){
+	input(action, repeat=false){
 		const {bag,hold,piece,rot,x,y} = this
 		const pd = Block.pb[piece][rot]
 		const y_min = Block.y_min[piece][rot]
 		let bpf, delay, grav
 		switch(action){
 			case 'down':
-				this.down(1)
+				this.down(1, !repeat)
 			break
 			case 'left':
 				this.can_move(x-1,y,pd,y_min) && (this.x -= 1)
@@ -418,7 +418,7 @@ class Block{
 			pd >>= 1
 		}
 	}
-	down(bpf){
+	down(bpf, can_drop=true){
 		const {piece,rot,x,y} = this
 		const pd = Block.pb[piece]?.[rot]
 		if(!pd){ return }
@@ -428,7 +428,7 @@ class Block{
 			can_move = this.can_move(x, y+1, pd, y_min)
 			bpf && can_move && (this.y += 1)
 		} while(--bpf > 0)
-		can_move || this.drop(x,y,pd,y_min)
+		can_drop && !can_move && this.drop(x,y,pd,y_min)
 	}
 	drop(x, y, pd, y_min){
 		if(!pd){ return }
