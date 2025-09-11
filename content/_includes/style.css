@@ -54,7 +54,7 @@ ds-clock {
 	display:block;
 	float:left;
 	font-size:1.5em;
-	margin:0 0 0 var(--pad);
+	margin:.25lh calc(-.25 * var(--pad)) .125lh var(--pad);
 	padding:4px 4px 4px 6px;
 }
 .big {font-size:2em;line-height:1.5;}
