@@ -3,34 +3,33 @@ layout: page
 title: DailyShip
 description: Ship projects faster than your competitors!
 ---
-<nav class='big'>
+<nav class='big brb'>
   <ul>
     <li><a href='/demo/block/'>Block</a>
     <li><a href='/demo/cannon/'>Cannon</a>
     <li><a href='https://vezquex.github.io/'>Clocks</a>
   </ul>
 </nav>
-<hr>
-<nav>
+<nav class='hr'>
   <ul>
     <li webc:for='post of collections.post.reverse()'>
       <a :href='post.url' @text='post.data.title'></a>
     </li>
   </ul>
 </nav>
-<hr>
-<nav class='blt'>
+<nav class='blt hr'>
   <ul>
     <li><a href='https://qchat.rizon.net/?channels=dailyship'>Chat</a>
     <li class='grow'><a href='https://github.com/hackdash/dailyship'>Code</a>
   </ul>
 </nav>
-<hr>
+<div class='hr'>
 <p>
   <span @text='description' webc:nokeep></span>
   <br>
   Aboard this tiny ship, set sail for a three hour tour.
-<hr>
+</div>
+<div class='hr'>
 <h1>Resources</h1>
 <nav>
 <ul>
@@ -38,6 +37,8 @@ description: Ship projects faster than your competitors!
 <li><a href='https://www.isekaikitchen.com/'>Isekai Kitchen cooking & recipes</a>
 </ul>
 </nav>
-<hr>
+</div>
+<div class='box hr'>
 <ds-clock></ds-clock>
 <ds-clock zone='0'></ds-clock>
+</div>
