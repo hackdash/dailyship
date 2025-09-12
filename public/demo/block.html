@@ -12,7 +12,7 @@
 body, html, main {height:100%;}
 body, button, input {
 	font-family:'Roboto Mono','Noto Mono',monospace,system-ui;
-	font-size:16px;
+	font-size:clamp(10px, 2vw, 16px);
 	line-height:1.5;
 }
 body {
@@ -29,6 +29,7 @@ button, label, input {
 	cursor:pointer;
 	user-select:none;
 }
+input[type=checkbox]{height:1em;width:1em;}
 button, .button {
 	background:0;
 	border-color:rgba(127,127,127,.5);
@@ -40,17 +41,20 @@ input:focus{outline:1px solid;}
 .button {border-style:outset;}
 .column {display:flex;flex-direction:column;}
 .ctrl {
+	align-self: flex-end;
 	fill:#FFF;
 	height:var(--size);
 	padding:0;
 	user-select:none;
+	width:var(--size);
 }
-.ctrl svg {width:var(--size);}
 .fade {opacity:.5;}
 .grow {flex-grow:1;}
 .hotkey {text-decoration:underline dotted;}
 .row {display:flex;}
-.text-btn {padding:2px 0 2px 4px;}
+.text-btn {
+	padding:2px 0 2px 4px;
+}
 .uni-btn {line-height:0;}
 .wide {width:100%;}
 input[type=number]{direction:rtl;}
@@ -65,7 +69,7 @@ input[type=number]{direction:rtl;}
 <body autofocus tabindex='0'>
 <main class='row'>
 <svg class='grow' viewBox='0 0 10 24'>
-	<rect id='wall' fill='none' width='10' height='22'></rect>
+	<rect id='wall' fill='none' width='10' height='23'></rect>
 </svg>
 <div class='column' style='min-width:7ch;width:var(--size);'>
 <div id='status'></div>
@@ -105,23 +109,13 @@ input[type=number]{direction:rtl;}
 	</svg>
 </button>
 <button onPointerDown="game.input('reverse')" class='ctrl touch' aria-label='Reverse'>
-	<div class='uni-btn' style='font-size:10vh;'>&#x21b6;</div>
-	<!--
-	<svg viewBox="0 0 128 64">
-		<path d="M40.35,64.73c1.58,1.39,3.99,1.24,5.38-0.34c0.62-0.7,0.96-1.61,0.95-2.54V48.43c0-1.06,0.85-1.91,1.91-1.92h32.6c4.6,0,11.12,1.44,11.5,11.51l14.19,12.75l0,0c0.77-2.91,1.15-5.91,1.12-8.92c0-17-12-30.68-26.84-30.68H48.59c-1.05-0.01-1.9-0.86-1.91-1.91V15.83c-0.02-2.1-1.73-3.8-3.84-3.78c-0.92,0.01-1.8,0.34-2.49,0.95l-23,23c-1.59,1.41-1.73,3.85-0.31,5.44c0.1,0.11,0.2,0.22,0.31,0.31L40.35,64.73z"/>
-	</svg>
-	-->
+	<div class='uni-btn' style='font-size:var(--size);'>&#x21b6;</div>
 </button>
 <button onPointerDown="game.input('rotate')" class='ctrl touch' aria-label='Rotate'>
-	<div class='uni-btn' style='font-size:10vh;'>&#x21b7;</div>
-	<!--
-	<svg viewBox="0 0 128 64">
-		<path d="M83.6,67c-1.68,1.44-4.2,1.24-5.64-0.44C77.35,65.85,77.01,64.94,77,64V50c0-1.1-0.9-2-2-2H41c-4.8,0-11.5,1.5-12,12L14.2,73.3l0,0c-0.8-3.03-1.21-6.16-1.2-9.3c0-17.7,12.5-32,28-32h34c1.1,0,2-0.9,2-2V16c0.02-2.21,1.83-3.98,4.04-3.96c0.94,0.01,1.85,0.35,2.56,0.96l24,24c1.66,1.46,1.82,3.99,0.35,5.65c-0.11,0.13-0.23,0.24-0.35,0.35L83.6,67z"/>
-	</svg>
-	-->
+	<div class='uni-btn' style='font-size:var(--size);'>&#x21b7;</div>
 </button>
 <button onPointerDown="game.input('hold')" class='ctrl touch' aria-label='Hold'>
-	<svg viewBox="0 0 128 128">
+	<svg viewBox="-16 -16 160 160">
 		<path d="M27.3,36.56c0,0,19.47,10.45,20.59,10.95c1.12,0.51,2.64-0.2,3.35-1.83c0.71-1.62,11.16-21.1,11.66-21.91s0.91-2.33,2.74-1.52s4.16-5.27,4.16-5.27L51.13,6.03L41.9,7.25L26.59,34.94L27.3,36.56z"/>
 		<path d="M26.38,84.33c0,0,27.18,0.3,28.81,0.3c1.62,0,3.14,0.41,3.35,2.54c0.2,2.13-0.2,26.37-0.2,26.37l-10.45,0.1l-15.52-0.71l-8.32-3.45l-6.49-15.11L26.38,84.33z"/>
 		<path d="M107.73,43.86c0,0-21.2,12.48-21.71,12.78s-1.12,1.32-0.2,2.94s11.06,20.08,11.87,21.5c0.81,1.42,1.72,3.14,0.3,4.16c-1.42,1.01,2.13,4.67,2.13,4.67l10.04-1.12l6.8-4.36l5.07-8.42c0,0-0.91-9.94-1.12-10.24c-0.2-0.3-9.43-18.97-9.43-18.97L107.73,43.86z"/>
@@ -154,6 +148,7 @@ const {ceil,floor,max,min,random,round} = Math
 const N = 4
 const NN = N * N
 class Block{
+	static prev_z = .333
 	static score = {
 		1: 100,
 		2: 300,
@@ -187,6 +182,11 @@ class Block{
 		T: [0b00001110010, 0b000001001100010, 0b001001110000, 0b00001000110010],
 		Z: [0b00001100011, 0b000001001100100, 0b011000110000, 0b00000100110010],
 	}
+	static padb = {I:2,J:2,L:2,O:1,S:2,T:2,Z:2}
+	static padl = {I:0,J:0,L:0,O:1,S:0,T:0,Z:0}
+	static padr = {I:0,J:1,L:1,O:1,S:1,T:1,Z:1}
+	static padt = {I:1,J:0,L:0,O:1,S:0,T:0,Z:0}
+	static y_init = -1
 	static y_min = {
 		I: [-1, -4, -1, -4],
 		J: [-2, -3, -2, -3],
@@ -207,14 +207,14 @@ class Block{
 		J: [0,125,250],
 		L: [255,215,0],
 		O: [255,140,0],
-		S: [250,128,114],
+		S: [0,240,0],
 		T: [64,224,208],
 		Z: [192,0,0],
 		1: [225,125,255],
 		2: [125,175,250],
 		3: [255,215,107],
 		4: [255,140,70],
-		5: [250,192,171],
+		5: [72,216,72],
 		6: [64,224,208],
 		7: [192,96,96],
 	}
@@ -276,7 +276,8 @@ class Block{
 		const o = Object.assign({
 			bpf: 1,
 			color: {},
-			ghost_opacity: 0.4,
+			ghost_alpha: 0.4,
+			preview: 3,
 			sizer: null,
 			status: null,
 		}, options)
@@ -313,7 +314,8 @@ class Block{
 			const action = this.keymap[e.code]
 			this.keyhold[action] = false
 		})
-		this.ghost_opacity = o.ghost_opacity
+		this.ghost_alpha = o.ghost_alpha
+		this.preview = o.preview
 		const resize_raf = requestAnimationFrame.bind(null, this.resize.bind(this))
 		window.addEventListener('resize', resize_raf)
 		this.reset()
@@ -388,31 +390,31 @@ class Block{
 		}
 		return !(pd & region)
 	}
-	dc(x, y, co, opacity=1, grad){
+	dc(x, y, co, opacity=1, grad=false, z=1){
 		const {c,g,ghs} = this
 		y += ghs
 		if(grad){
 			const grad = c.createLinearGradient(
-				g*x,
-				g*y,
-				g*(x+1)-1,
-				g*(y+1)-1,
+				g*x*z,
+				g*y*z,
+				g*(x+1)*z-1,
+				g*(y+1)*z-1,
 			)
-			grad.addColorStop(0, `rgba(${min(255,co[0]+64)},${min(255,co[1]+64)},${min(255,co[2]+64)},${opacity})`)
-			grad.addColorStop(1, `rgba(${max(0,co[0]-64)},${max(0,co[1]-64)},${max(0,co[2]-64)},${opacity})`)
+			grad.addColorStop(0,`rgba(${min(255,co[0]+64)},${min(255,co[1]+64)},${min(255,co[2]+64)},${opacity})`)
+			grad.addColorStop(1,`rgba(${max(0,co[0]-64)},${max(0,co[1]-64)},${max(0,co[2]-64)},${opacity})`)
 			c.fillStyle = grad
 		}
 		else{
 			c.fillStyle = rgb(co)
 		}
-		c.fillRect(g*x, g*y, g-1, g-1)
+		c.fillRect(g*x*z, g*y*z, g*z-1, g*z-1)
 	}
-	dp(piece, rot, x, y, opacity){
+	dp(piece, rot, x, y, opacity, z){
 		const {color} = this
 		let pd = Block.pb[piece][rot]
 		let dx = 0
 		while(pd){
-			;(pd & 1) && this.dc(x + dx, y, color[piece], opacity, true)
+			;(pd & 1) && this.dc(x + dx, y, color[piece], opacity, true, z)
 			dx = (dx+1) % N
 			dx || (y += 1)
 			pd >>= 1
@@ -468,7 +470,7 @@ class Block{
 		this.score += (Block.score[lines] ?? (100 * lines)) + (2 * (y - max(0, this.y)))
 	}
 	frame(){
-		const {c,color,field,g,gh,ghs,gs,gw,h,hold,w} = this
+		const {c,color,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,w} = this
 		let {bag,piece,rot,x,y} = this
 		c.clearRect(0, 0, w, h)
 		c.fillStyle = rgb(color.bg)
@@ -476,7 +478,7 @@ class Block{
 		for(let i=gs-1; i>=0; --i){
 			field[i] && this.dc(i % gw, floor(i / gw), color[field[i]])
 		}
-		if(bag.length < 4){
+		if(bag.length <= max(1, preview)){
 			this.bag.unshift(...shuffle(Block.pieces.slice(0)))
 			bag = this.bag
 		}
@@ -484,7 +486,7 @@ class Block{
 			piece = this.piece = bag.pop()
 			rot = this.rot = 0
 			x = this.x = 3
-			y = this.y = (piece === 'O' || piece === 'I') ? -2 : -1
+			y = this.y = Block.y_init - Block.padt[piece]
 		}
 		const pd = Block.pb[piece][rot]
 		const y_min = Block.y_min[piece][rot]
@@ -504,11 +506,18 @@ class Block{
 			y_ghost += 1
 		}
 		if(y !== y_ghost){
-			this.dp(piece,rot,x,y_ghost,this.ghost_opacity)
+			this.dp(piece,rot,x,y_ghost,ghost_alpha)
 		}
+		hold && this.dp(hold,0,0,Block.y_init-Block.padt[hold]-1,1,Block.prev_z)
+		x = round(gw / Block.prev_z)
+		y = Block.y_init - 1
+		bag.slice(-preview).forEach((piece, i) => {
+			x += Block.padr[piece] - N
+			this.dp(piece,0,x,y-Block.padt[piece],max(.1, 1-(preview-i-1)*.2),Block.prev_z)
+			x += Block.padl[piece] - 1
+		})
+		x = round(gw / Block.prev_z - N)
 		this.status.innerHTML = `${
-			bag.toReversed().slice(0,3).map(this.preview.bind(this)).join(' ')
-			}\n[ ${hold ? this.preview(hold) : '\u00a0'} ]\n${
 			(this.score+'')}\n${
 			(this.lines+'')
 		}`
@@ -544,9 +553,6 @@ class Block{
 		this.timeout = window.setTimeout(this.gravity_loop, delay)
 		this.frame()
 	}
-	preview(p){
-		return `<span style='color:${rgb(this.color[p])};'>${p}</span>`
-	}
 	reset(){
 		this.bag = []
 		this.hold = void 0
@@ -554,7 +560,7 @@ class Block{
 		this.piece = void 0
 		this.score = 0
 		const gh = this.gh = 20
-		const ghs = this.ghs = 2
+		const ghs = this.ghs = 3
 		this.ght = gh + ghs
 		const gw = this.gw = 10
 		this.resize()
