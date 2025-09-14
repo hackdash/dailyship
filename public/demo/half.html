@@ -1,0 +1,24 @@
+<!doctype html>
+<meta charset='utf-8'/>
+<meta name='viewport' content='width=device-width, initial-scale=1'/>
+<title>Half</title>
+<style>
+body {background:#202020; margin: 0; padding: 1em;color:#fff; font-family: sans-serif; font-size:64px;}
+</style>
+<div id='w'></div>
+<div id='h'></div>
+<script>
+function resize(){
+	const h = window.innerHeight
+  document.getElementById('h').innerText = `${h}`
+	const w = window.innerWidth
+  document.getElementById('w').innerText = `${w}`
+  // document.body.style.color = (w*2 < sw)
+  //   ? '#60C0C0'
+  //   : (w*2 > sw)
+  //   ? '#C06060'
+  //   : '#C0C0C0'
+}
+window.addEventListener('resize', resize)
+resize()
+</script>
