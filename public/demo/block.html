@@ -286,6 +286,7 @@ class Block{
 		if(!status){ throw new Error('status element required')	}
 		this.sizer = sizer
 		this.status = status
+		this.storage = (typeof Storage) && (localStorage instanceof Storage) && localStorage
 		this.bpf = o.bpf
 		const create_canvas = !canvas
 		create_canvas && (canvas = document.createElement('canvas'))
@@ -318,10 +319,10 @@ class Block{
 		this.preview = o.preview
 		const resize_raf = requestAnimationFrame.bind(null, this.resize.bind(this))
 		window.addEventListener('resize', resize_raf)
-		this.reset()
+		this.reset(true)
 	}
 	input(action, repeat=false){
-		const {bag,hold,piece,rot,x,y} = this
+		const {bag,hold,piece,rot,storage,x,y} = this
 		const pd = Block.pb[piece][rot]
 		const y_min = Block.y_min[piece][rot]
 		let bpf, delay, grav
@@ -345,6 +346,8 @@ class Block{
 				hold && bag.push(hold)
 				this.hold = piece
 				this.piece = void 0
+				storage && storage.setItem('bag',bag)
+				storage && storage.setItem('hold',this.hold)
 			break
 			case 'pause':
 				grav = !this.grav
@@ -437,7 +440,7 @@ class Block{
 		while(this.can_move(x,y+1,pd,y_min)){
 			y += 1
 		}
-		const {field,gw} = this
+		const {field,gw,storage} = this
 		const ci = Block.ci[this.piece]
 		let dx = 0, i, yi = y
 		while(pd){
@@ -468,19 +471,22 @@ class Block{
 		}
 		this.lines += lines
 		this.score += (Block.score[lines] ?? (100 * lines)) + (2 * (y - max(0, this.y)))
+		storage && storage.setItem('field',field.toBase64())
+		storage && storage.setItem('lines',this.lines)
+		storage && storage.setItem('score',this.score)
 	}
 	frame(){
-		const {c,color,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,w} = this
+		const {c,color,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,storage,w} = this
 		let {bag,piece,rot,x,y} = this
+		const bag_length = bag.length
 		c.clearRect(0, 0, w, h)
 		c.fillStyle = rgb(color.bg)
 		c.fillRect(0, ghs*g, w, gh*g)
 		for(let i=gs-1; i>=0; --i){
 			field[i] && this.dc(i % gw, floor(i / gw), color[field[i]])
 		}
-		if(bag.length <= max(1, preview)){
-			this.bag.unshift(...shuffle(Block.pieces.slice(0)))
-			bag = this.bag
+		if(bag_length <= max(1, preview)){
+			bag.unshift(...shuffle(Block.pieces.slice(0)))
 		}
 		if(!piece){
 			piece = this.piece = bag.pop()
@@ -521,6 +527,7 @@ class Block{
 			(this.score+'')}\n${
 			(this.lines+'')
 		}`
+		storage && (bag_length !== bag.length) && storage.setItem('bag',bag.concat(piece))
 	}
 	gravitate(delay, grav, clear, bpf){
 		if(grav === void 0){ grav = this.grav }
@@ -553,20 +560,31 @@ class Block{
 		this.timeout = window.setTimeout(this.gravity_loop, delay)
 		this.frame()
 	}
-	reset(){
-		this.bag = []
-		this.hold = void 0
-		this.lines = 0
+	reset(revive=false){
+		const {storage} = this
+		if(revive && storage){
+			this.bag = storage.getItem('bag')?.split(',')
+			this.hold = storage.getItem('hold')
+			this.lines = parseInt(storage.getItem('lines'))
+			this.score = parseInt(storage.getItem('score'))
+		}
+		this.bag ||= []
+		this.hold ||= void 0
+		this.lines ||= 0
 		this.piece = void 0
-		this.score = 0
+		this.score ||= 0
+		const delay = this.delay ?? 1000
 		const gh = this.gh = 20
 		const ghs = this.ghs = 3
 		this.ght = gh + ghs
 		const gw = this.gw = 10
 		this.resize()
 		const gs = this.gs = gh * gw
-		const field = this.field = new Uint8Array(gs)
-		const delay = this.delay ?? 1000
+		this.field = new Uint8Array(gs)
+		if(revive && storage){
+			const field = storage.getItem('field')
+			field && this.field.setFromBase64(field)
+		}
 		this.gravitate(delay, void 0, true, this.bpf)
 		this.frame()
 	}
