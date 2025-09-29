@@ -200,9 +200,6 @@ class Block{
 	static pieces = Object.keys(Block.pb)
 	static color_default = {
 		bg: [0,0,0],
-		field: [80,80,80],
-		block: [16,16,16],
-		text: [127,127,127],
 		I: [150,0,255],
 		J: [0,125,250],
 		L: [255,215,0],
@@ -217,6 +214,7 @@ class Block{
 		5: [72,216,72],
 		6: [64,224,208],
 		7: [192,96,96],
+		8: [80,40,80],
 	}
 	static keymap = {
 		'ArrowDown': 'down',
@@ -440,7 +438,7 @@ class Block{
 		while(this.can_move(x,y+1,pd,y_min)){
 			y += 1
 		}
-		const {field,gw,storage} = this
+		const {field,gs,gw,storage} = this
 		const ci = Block.ci[this.piece]
 		let dx = 0, i, yi = y
 		while(pd){
@@ -452,7 +450,7 @@ class Block{
 		}
 		if(yi < 0){ return }
 		this.piece = void 0
-		i = field.length
+		i = gs
 		let count = 0
 		let lines = 0
 		while(--i >= 0){
@@ -471,7 +469,7 @@ class Block{
 		}
 		this.lines += lines
 		this.score += (Block.score[lines] ?? (100 * lines)) + (2 * (y - max(0, this.y)))
-		storage && storage.setItem('field',field.toBase64())
+		storage && storage.setItem('field',field.map(a=>a?8:0).toBase64())
 		storage && storage.setItem('lines',this.lines)
 		storage && storage.setItem('score',this.score)
 	}
