@@ -264,9 +264,6 @@ class Block{
 	static level = 4
 	static skiplines = 120 * Block.level
 	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
-	static color_default = {
-		bg: '#000',
-	}
 	static ppci = {1:0,2:2,3:1,4:0,5:2,6:0,7:1}
 	static ppco = {I:0,J:2,L:1,O:0,S:2,T:0,Z:1}
 	static prev_z = 1/4
@@ -375,7 +372,6 @@ class Block{
 	constructor(options){
 		const o = Object.assign({
 			bpf: 1,
-			color: {},
 			ghost_alpha: 0.5,
 			preview: 1,
 			sizer: null,
@@ -394,7 +390,6 @@ class Block{
 		canvas.style.position = 'absolute'
 		create_canvas && document.body.appendChild(canvas)
 		const c = this.c = canvas.getContext('2d')
-		this.color = Object.assign({}, Block.color_default, o.color)
 		this.keyhold = {}
 		this.keymap = Block.keymap
 		document.addEventListener('keydown', e => {
@@ -523,7 +518,6 @@ class Block{
 		c.restore()
 	}
 	dp(piece, rot, x, y, opacity, z){
-		const {color} = this
 		let pd = Block.pb[piece][rot]
 		let dx = 0
 		while(pd){
@@ -588,11 +582,11 @@ class Block{
 	}
 	frame(){
 		const pz = Block.prev_z
-		const {c,color,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,w} = this
+		const {c,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,w} = this
 		let {bag,piece,rot,x,y} = this
 		const bag_length = bag.length
 		c.clearRect(0, 0, w, h)
-		c.fillStyle = color.bg
+		c.fillStyle = palette[0x0F]
 		c.fillRect(0, ghs*g, w, gh*g)
 		for(let i=gs-1; i>=0; --i){
 			field[i] && this.dc(i % gw, floor(i / gw), Block.ppci[field[i]])
@@ -763,7 +757,6 @@ function shuffle(a){
 	return a
 }
 const game = new Block({
-	color:{},
 	sizer:eid('wall'),
 	status:eid('status'),
 })
