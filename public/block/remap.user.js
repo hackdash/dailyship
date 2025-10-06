@@ -10,12 +10,18 @@
 // ==/UserScript==
 
 game.keymap={
-  ArrowUp:'drop',
   ArrowDown:'down',
   ArrowLeft:'left',
   ArrowRight:'right',
-  KeyZ:'reverse',
-  KeyX:'rotate',
+  ArrowUp:'drop',
+  BracketLeft:'delay_decrement',
+  BracketRight:'delay_increment',
+  End:'reset',
+  Equal:'bpf_increment',
   KeyC:'hold',
   KeyP:'pause',
+  KeyX:'rotate',
+  KeyZ:'reverse',
+  Minus:'bpf_decrement',
+  PageDown:'up',
 };
