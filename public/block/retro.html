@@ -741,8 +741,8 @@ class Block{
 		i ??= floor(this.lines / Block.level) % 256
 		eid('theme').value = i
 		if(i <= 137){ i %= 10 }
-		else if(i <= 201){ i -= 192 }
-		else{ i -= 64 }
+		if((i >= 192) && (i <= 201)){ i -= 192 }
+		if(i >= 202){ i -= 64 }
 		this.theme = themes[i]
 	}
 	store_get(k){
