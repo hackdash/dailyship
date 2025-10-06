@@ -379,7 +379,8 @@ const themes = {
 	255:[0o0,0o0,0o0],
 }
 class Block{
-	static level = 10
+	static level = 4
+	static skiplines = 120 * Block.level
 	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
 	static color_default = {
 		bg: '#000',
@@ -706,12 +707,9 @@ class Block{
 		if(!this.can_move(x,y,pd,y_min)){
 			if(y > -3){
 				this.y -= 1
-				this.frame()
+				return this.frame()
 			}
-			else{
-				this.grav && this.gravitate(void 0, false, true)
-			}
-			return
+			return this.grav && this.gravitate(void 0, false, true)
 		}
 		this.dp(piece,rot,x,y)
 		let y_ghost = y
@@ -776,7 +774,7 @@ class Block{
 	reset(revive=false){
 		this.bag = revive && this.store_get('bag')?.split(',') || []
 		this.hold = revive && this.store_get('hold') || void 0
-		this.lines = revive && parseInt(this.store_get('lines')) || 1280
+		this.lines = revive && parseInt(this.store_get('lines')) || Block.skiplines
 		this.piece = void 0
 		this.score = revive && parseInt(this.store_get('score')) || 0
 		this.set_theme()
