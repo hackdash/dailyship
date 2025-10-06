@@ -23,5 +23,5 @@ game.keymap={
   KeyX:'rotate',
   KeyZ:'reverse',
   Minus:'bpf_decrement',
-  PageDown:'up',
+  PageUp:'up',
 };
