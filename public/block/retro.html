@@ -822,7 +822,7 @@ class Block{
 		w = this.w = g * gw
 		const x = floor(rect.x)
 		const y = floor(rect.y)
-		const v_pad = rect.height - h
+		const v_pad = round((rect.height - h) / 2)
 		const scale = window.devicePixelRatio
 		canvas.style.height = `${h}px`
 		canvas.height = h * scale
