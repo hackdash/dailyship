@@ -380,7 +380,7 @@ const themes = {
 }
 class Block{
 	static level = 4
-	static skiplines = 120 * Block.level
+	static skiplines = 146 * Block.level
 	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
 	static color_default = {
 		bg: '#000',
@@ -610,12 +610,29 @@ class Block{
 		return !(pd & region)
 	}
 	dc(x, y, co, opacity=1, z=1){
-		const {c,g,ghs,theme} = this
+		const {c,g,g8,ghs,theme} = this
 		y += ghs
 		c.save()
 		c.globalAlpha = opacity
+		c.fillStyle = '#000'
+		c.fillRect(g*x*z, g*y*z, g*z, g*z)
+		if(!co){
+			c.fillStyle = palette[theme[2]]
+			c.fillRect(x*g*z, y*g*z, 7*g8*z, 7*g8*z)
+		}
 		c.fillStyle = palette[theme[co]]
-		c.fillRect(g*x*z, g*y*z, g*z-1, g*z-1)
+		if(!co){
+			c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
+		}
+		if(co){
+			c.fillRect(g*x*z, g*y*z, 7*g8*z, 7*g8*z)
+			c.fillStyle = palette[theme[0]]
+			c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, g8*z, g8*z)
+			c.fillRect((1 + x*8)*g8*z, (2 + y*8)*g8*z, g8*z, g8*z)
+			c.fillRect((2 + x*8)*g8*z, (1 + y*8)*g8*z, g8*z, g8*z)
+		}
+		c.fillStyle = palette[theme[0]]
+		c.fillRect(x*g*z, y*g*z, g8*z, g8*z)
 		c.restore()
 	}
 	dp(piece, rot, x, y, opacity, z){
@@ -798,7 +815,9 @@ class Block{
 		const rect = sizer.getBoundingClientRect()
 		let h = ceil(rect.height)
 		let w = ceil(rect.width)
-		const g = this.g = min(floor(h/ght), floor(w/gw))
+		let g = min(floor(h/ght), floor(w/gw))
+		const g8 = this.g8 = max(1, floor(g/8))
+		g = this.g = g8 * 8
 		h = this.h = g * ght
 		w = this.w = g * gw
 		const x = floor(rect.x)
