@@ -609,30 +609,35 @@ class Block{
 		}
 		return !(pd & region)
 	}
-	dc(x, y, co, opacity=1, z=1){
+	dc(x, y, ti, opacity=1, z=1){
 		const {c,g,g8,ghs,theme} = this
+		const pi = theme[ti]
+		const pi_0 = theme[0]
+		const pi_2 = theme[2]
 		y += ghs
 		c.save()
 		c.globalAlpha = opacity
 		c.fillStyle = '#000'
 		c.fillRect(g*x*z, g*y*z, g*z, g*z)
-		if(!co){
-			c.fillStyle = palette[theme[2]]
+		if(!ti){
+			c.fillStyle = palette[pi_2]
 			c.fillRect(x*g*z, y*g*z, 7*g8*z, 7*g8*z)
 		}
-		c.fillStyle = palette[theme[co]]
-		if(!co){
-			c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
-		}
-		if(co){
+		c.fillStyle = palette[pi]
+		!ti && (pi_2 !== pi) && c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
+		if(ti){
 			c.fillRect(g*x*z, g*y*z, 7*g8*z, 7*g8*z)
-			c.fillStyle = palette[theme[0]]
+			c.fillStyle = palette[pi_0]
+		}
+		if(ti && (pi_0 !== pi)){
 			c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, g8*z, g8*z)
 			c.fillRect((1 + x*8)*g8*z, (2 + y*8)*g8*z, g8*z, g8*z)
 			c.fillRect((2 + x*8)*g8*z, (1 + y*8)*g8*z, g8*z, g8*z)
 		}
-		c.fillStyle = palette[theme[0]]
-		c.fillRect(x*g*z, y*g*z, g8*z, g8*z)
+		if(pi_0 !== pi){
+			c.fillStyle = palette[pi_0]
+			c.fillRect(x*g*z, y*g*z, g8*z, g8*z)
+		}
 		c.restore()
 	}
 	dp(piece, rot, x, y, opacity, z){
