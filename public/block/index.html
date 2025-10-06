@@ -1,12 +1,12 @@
 <!doctype html>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
-<title>Retro Block</title>
+<title>Block</title>
 <style>
 * {box-sizing:border-box;}
 :root {
 	color-scheme:dark;
-	--bg:#787878;
+	--bg:#000;
 	--size:6vh;
 }
 body, html, main {height:100%;}
@@ -24,7 +24,7 @@ body {
 	margin:0;
 	overflow:hidden;
 }
-body:focus {border-color:#bcbcbc;}
+body:focus {border-color:rgb(60,0,60);}
 button, label, input {
 	cursor:pointer;
 	user-select:none;
@@ -38,7 +38,6 @@ button, .button {
 hr {border-width:0 1px 0 0;}
 input {background:0;border:0;border-radius:0;padding:0;}
 input:focus{outline:1px solid;}
-.bg2 {background:#000;}
 .button {border-style:outset;}
 .column {display:flex;flex-direction:column;}
 .ctrl {
@@ -69,16 +68,12 @@ input[type=number]{direction:rtl;}
 </style>
 <body autofocus tabindex='0'>
 <main class='row'>
-<svg class='grow' viewBox='0 0 10 23'>
+<svg class='grow' viewBox='0 0 10 24'>
 	<rect id='wall' fill='transparent' width='10' height='23'></rect>
 </svg>
-<div class='column bg2' style='min-width:7ch;width:var(--size);'>
+<div class='column' style='min-width:7ch;width:var(--size);'>
 <div id='status'></div>
 <div class='fade grow column'>
-<label class='button text-btn'>
-	Level<br>
-	<input id='theme' class='wide' min='0' max='255' step='1' onChange='game.set_theme(Math.min(255,parseInt(this.value)));game.frame()' type='number' autocomplete='off'>
-</label>
 <label class='button text-btn'>
 	<span class='hotkey'>G</span>rav<input id='grav' onChange='document.body.focus();game.gravitate(void 0, this.checked, true)' type='checkbox' autocomplete='off'>
 </label>
@@ -146,242 +141,15 @@ input[type=number]{direction:rtl;}
 </button>
 </div></div></main>
 <script>
-const {ceil,floor,max,min,random,round} = Math
 const eid = document.getElementById.bind(document)
-const appid = 'dsblockretro'
+const appid = 'dsblock'
+const color_margin = [30,0,30]
+document.documentElement.style.setProperty('--bg', `rgb(${color_margin.join()})`)
+const {ceil,floor,max,min,random,round} = Math
 const N = 4
 const NN = N * N
-const palette = {
-	[0x00]:'#7c7c7c',
-	[0x01]:'#0000fc',
-	[0x05]:'#a80020',
-	[0x08]:'#503000',
-	[0x09]:'#007800',
-	[0x0C]:'#004058',
-	[0x0F]:'#000000',
-	[0x10]:'#bbbbbb',
-	[0x12]:'#0058f8',
-	[0x13]:'#6844fc',
-	[0x14]:'#d800cc',
-	[0x15]:'#e40058',
-	[0x16]:'#f83800',
-	[0x18]:'#ac7c00',
-	[0x1A]:'#00a800',
-	[0x1C]:'#008888',
-	[0x20]:'#f7f7f7',
-	[0x21]:'#3cbcfc',
-	[0x22]:'#6888fc',
-	[0x24]:'#f878f8',
-	[0x25]:'#f85898',
-	[0x26]:'#f87858',
-	[0x27]:'#fca044',
-	[0x29]:'#b8f818',
-	[0x2A]:'#58d854',
-	[0x2B]:'#58f898',
-	[0x2D]:'#787878',
-	[0x30]:'#fbfbfb',
-	[0x36]:'#f0d0b0',
-	[0x37]:'#fce0a8',
-}
-const themes = {
-	0:[0x30,0x21,0x12],
-	1:[0x30,0x29,0x1A],
-	2:[0x30,0x24,0x14],
-	3:[0x30,0x2A,0x12],
-	4:[0x30,0x2B,0x15],
-	5:[0x30,0x22,0x2B],
-	6:[0x30,0x00,0x16],
-	7:[0x30,0x05,0x13],
-	8:[0x30,0x16,0x12],
-	9:[0x30,0x27,0x16],
-	138:[0x26,0x29,0x25],
-	139:[0x09,0x14,0x30],
-	140:[0x29,0x30,0x05],
-	141:[0x26,0x09,0x25],
-	142:[0x09,0x14,0x30],
-	143:[0x29,0x30,0x05],
-	144:[0x20,0x25,0x09],
-	145:[0x20,0x30,0x16],
-	146:[0x0F,0x09,0x01],
-	147:[0x20,0x25,0x24],
-	148:[0x00,0x10,0x0F],
-	149:[0x24,0x25,0x37],
-	150:[0x25,0x20,0x2B],
-	151:[0x05,0x26,0x0C],
-	152:[0x18,0x25,0x25],
-	153:[0x37,0x10,0x36],
-	154:[0x24,0x09,0x1C],
-	155:[0x30,0x29,0x00],
-	156:[0x24,0x05,0x05],
-	157:[0x01,0x29,0x01],
-	158:[0x08,0x29,0x05],
-	159:[0x00,0x26,0x0F],
-	160:[0,0,0],
-	161:[0,0,0],
-	162:[0,0,0],
-	163:[0,0,0],
-	164:[0,0,0],
-	165:[0,0,0],
-	166:[0,0,0],
-	167:[0,0,0],
-	168:[0,0,0],
-	169:[0,0,0],
-	170:[0,0,0],
-	171:[0,0,0],
-	172:[0,0,0],
-	173:[0,0,0],
-	174:[0,0,0],
-	175:[0,0,0],
-	176:[0,0,0],
-	177:[0,0,0],
-	178:[0,0,0],
-	179:[0,0,0],
-	180:[0,0,0],
-	181:[0,0,0],
-	182:[0,0,0],
-	183:[0,0,0],
-	184:[0,0,0],
-	185:[0,0,0],
-	186:[0,0,0],
-	187:[0,0,0],
-	188:[0,0,0],
-	189:[0,0,0],
-	190:[0,0,0],
-	191:[0,0,0],
-	192:[0,0,0],
-	193:[0,0,0],
-	194:[0,0,0],
-	195:[0,0,0],
-	196:[0,0,0],
-	197:[0,0,0],
-	198:[0,0,0],
-	199:[0,0,0],
-	200:[0,0,0],
-	201:[0,0,0],
-	202:[0,0,0],
-	203:[0,0,0],
-	204:[0,0,0],
-	205:[0,0,0],
-	206:[0,0,0],
-	207:[0,0,0],
-	208:[0,0,0],
-	209:[0,0,0],
-	200:[0,0,0],
-	201:[0,0,0],
-	202:[0,0,0],
-	203:[0,0,0],
-	204:[0,0,0],
-	205:[0,0,0],
-	206:[0,0,0],
-	207:[0,0,0],
-	208:[0,0,0],
-	209:[0,0,0],
-	210:[0,0,0],
-	211:[0,0,0],
-	212:[0,0,0],
-	213:[0,0,0],
-	214:[0,0,0],
-	215:[0,0,0],
-	216:[0,0,0],
-	217:[0,0,0],
-	218:[0,0,0],
-	219:[0,0,0],
-	210:[0,0,0],
-	211:[0,0,0],
-	212:[0,0,0],
-	213:[0,0,0],
-	214:[0,0,0],
-	215:[0,0,0],
-	216:[0,0,0],
-	217:[0,0,0],
-	218:[0,0,0],
-	219:[0,0,0],
-	220:[0,0,0],
-	221:[0,0,0],
-	222:[0,0,0],
-	223:[0,0,0],
-	224:[0,0,0],
-	225:[0,0,0],
-	226:[0,0,0],
-	227:[0,0,0],
-	228:[0,0,0],
-	229:[0,0,0],
-	220:[0,0,0],
-	221:[0,0,0],
-	222:[0,0,0],
-	223:[0,0,0],
-	224:[0,0,0],
-	225:[0,0,0],
-	226:[0,0,0],
-	227:[0,0,0],
-	228:[0,0,0],
-	229:[0,0,0],
-	230:[0,0,0],
-	231:[0,0,0],
-	232:[0,0,0],
-	233:[0,0,0],
-	234:[0,0,0],
-	235:[0,0,0],
-	236:[0,0,0],
-	237:[0,0,0],
-	238:[0,0,0],
-	239:[0,0,0],
-	230:[0,0,0],
-	231:[0,0,0],
-	232:[0,0,0],
-	233:[0,0,0],
-	234:[0,0,0],
-	235:[0,0,0],
-	236:[0,0,0],
-	237:[0,0,0],
-	238:[0,0,0],
-	239:[0,0,0],
-	240:[0,0,0],
-	241:[0,0,0],
-	242:[0,0,0],
-	243:[0,0,0],
-	244:[0,0,0],
-	245:[0,0,0],
-	246:[0,0,0],
-	247:[0,0,0],
-	248:[0,0,0],
-	249:[0,0,0],
-	240:[0,0,0],
-	241:[0,0,0],
-	242:[0,0,0],
-	243:[0,0,0],
-	244:[0,0,0],
-	245:[0,0,0],
-	246:[0,0,0],
-	247:[0,0,0],
-	248:[0,0,0],
-	249:[0,0,0],
-	250:[0,0,0],
-	251:[0,0,0],
-	252:[0,0,0],
-	253:[0,0,0],
-	254:[0,0,0],
-	255:[0,0,0],
-	256:[0,0,0],
-	257:[0,0,0],
-	258:[0,0,0],
-	259:[0,0,0],
-	250:[0,0,0],
-	251:[0,0,0],
-	252:[0,0,0],
-	253:[0,0,0],
-	254:[0,0,0],
-	255:[0,0,0],
-}
 class Block{
-	static level = 10
-	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
-	static color_default = {
-		bg: '#000',
-	}
-	static ppci = {1:0,2:2,3:1,4:0,5:2,6:0,7:1}
-	static ppco = {I:0,J:2,L:1,O:0,S:2,T:0,Z:1}
-	static prev_z = 1/4
+	static prev_z = .333
 	static score = {
 		1: 100,
 		2: 300,
@@ -408,18 +176,18 @@ class Block{
 	}
 	static pb = {
 		I: [0b00011110000, 0b100010001000100, 0b111100000000, 0b10001000100010],
-		J: [0b010001110000, 0b00001100100010, 0b00001110001, 0b000001000100110],
-		L: [0b000101110000, 0b00001000100011, 0b00001110100, 0b000011000100010],
+		J: [0b00001110001, 0b000001000100110, 0b010001110000, 0b00001100100010],
+		L: [0b00001110100, 0b000011000100010, 0b000101110000, 0b00001000100011],
 		O: [0b11001100000, 0b000011001100000, 0b011001100000, 0b00011001100000],
 		S: [0b00000110110, 0b000010001100010, 0b001101100000, 0b00001000110001],
-		T: [0b001001110000, 0b00001000110010, 0b00001110010, 0b000001001100010],
+		T: [0b00001110010, 0b000001001100010, 0b001001110000, 0b00001000110010],
 		Z: [0b00001100011, 0b000001001100100, 0b011000110000, 0b00000100110010],
 	}
-	static padb = {I:2,J:2,L:2,O:2,S:1,T:2,Z:1}
+	static padb = {I:2,J:2,L:2,O:1,S:2,T:2,Z:2}
 	static padl = {I:0,J:0,L:0,O:1,S:0,T:0,Z:0}
 	static padr = {I:0,J:1,L:1,O:1,S:1,T:1,Z:1}
-	static padt = {I:1,J:1,L:1,O:1,S:0,T:1,Z:0}
-	static y_init = 0
+	static padt = {I:1,J:0,L:0,O:1,S:0,T:0,Z:0}
+	static y_init = -1
 	static y_min = {
 		I: [-1, -4, -1, -4],
 		J: [-2, -3, -2, -3],
@@ -429,7 +197,26 @@ class Block{
 		T: [-2, -3, -2, -3],
 		Z: [-2, -3, -2, -3],
 	}
+	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
 	static pieces = Object.keys(Block.pb)
+	static color_default = {
+		bg: [0,0,0],
+		I: [150,0,255],
+		J: [0,125,250],
+		L: [255,215,0],
+		O: [255,140,0],
+		S: [0,240,0],
+		T: [64,224,208],
+		Z: [192,0,0],
+		1: [225,125,255],
+		2: [125,175,250],
+		3: [255,215,107],
+		4: [255,140,70],
+		5: [72,216,72],
+		6: [64,224,208],
+		7: [192,96,96],
+		8: [80,40,80],
+	}
 	static keymap = {
 		'ArrowDown': 'down',
 		'ArrowLeft': 'left',
@@ -488,8 +275,8 @@ class Block{
 		const o = Object.assign({
 			bpf: 1,
 			color: {},
-			ghost_alpha: 0.5,
-			preview: 1,
+			ghost_alpha: 0.4,
+			preview: 3,
 			sizer: null,
 			status: null,
 		}, options)
@@ -514,6 +301,8 @@ class Block{
 			if(!action || (document.activeElement !== document.body)){
 				return
 			}
+			// if(this.keyhold[e.code]){ return }
+			// this.keyhold[e.code] = true
 			action && this.input(action, e.repeat)
 			if(this.keydown){ return }
 			this.keydown = true
@@ -557,7 +346,7 @@ class Block{
 				this.hold = piece
 				this.piece = void 0
 				this.store('bag',bag)
-				this.store('hold',this.hold)
+				this.store('hold',piece)
 			break
 			case 'pause':
 				grav = !this.grav
@@ -603,21 +392,31 @@ class Block{
 		}
 		return !(pd & region)
 	}
-	dc(x, y, co, opacity=1, z=1){
-		const {c,g,ghs,theme} = this
+	dc(x, y, co, opacity=1, grad=false, z=1){
+		const {c,g,ghs} = this
 		y += ghs
-		c.save()
-		c.globalAlpha = opacity
-		c.fillStyle = palette[theme[co]]
+		if(grad){
+			const grad = c.createLinearGradient(
+				g*x*z,
+				g*y*z,
+				g*(x+1)*z-1,
+				g*(y+1)*z-1,
+			)
+			grad.addColorStop(0,`rgba(${min(255,co[0]+64)},${min(255,co[1]+64)},${min(255,co[2]+64)},${opacity})`)
+			grad.addColorStop(1,`rgba(${max(0,co[0]-64)},${max(0,co[1]-64)},${max(0,co[2]-64)},${opacity})`)
+			c.fillStyle = grad
+		}
+		else{
+			c.fillStyle = rgb(co)
+		}
 		c.fillRect(g*x*z, g*y*z, g*z-1, g*z-1)
-		c.restore()
 	}
 	dp(piece, rot, x, y, opacity, z){
 		const {color} = this
 		let pd = Block.pb[piece][rot]
 		let dx = 0
 		while(pd){
-			;(pd & 1) && this.dc(x + dx, y, Block.ppco[piece], opacity, z)
+			;(pd & 1) && this.dc(x + dx, y, color[piece], opacity, true, z)
 			dx = (dx+1) % N
 			dx || (y += 1)
 			pd >>= 1
@@ -671,21 +470,19 @@ class Block{
 		}
 		this.lines += lines
 		this.score += (Block.score[lines] ?? (100 * lines)) + (2 * (y - max(0, this.y)))
-		this.set_theme()
-		this.store('field',field.toBase64())
+		this.store('field',field.map(a=>a?8:0).toBase64())
 		this.store('lines',this.lines)
 		this.store('score',this.score)
 	}
 	frame(){
-		const pz = Block.prev_z
 		const {c,color,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,w} = this
 		let {bag,piece,rot,x,y} = this
 		const bag_length = bag.length
 		c.clearRect(0, 0, w, h)
-		c.fillStyle = color.bg
+		c.fillStyle = rgb(color.bg)
 		c.fillRect(0, ghs*g, w, gh*g)
 		for(let i=gs-1; i>=0; --i){
-			field[i] && this.dc(i % gw, floor(i / gw), Block.ppci[field[i]])
+			field[i] && this.dc(i % gw, floor(i / gw), color[field[i]])
 		}
 		if(bag_length <= max(1, preview)){
 			bag.unshift(...shuffle(Block.pieces.slice(0)))
@@ -716,21 +513,15 @@ class Block{
 		if(y !== y_ghost){
 			this.dp(piece,rot,x,y_ghost,ghost_alpha)
 		}
-		c.fillRect(0, 0, (N+2)*g*pz, N*g*pz)
-		x = round(gw / pz)
+		hold && this.dp(hold,0,0,Block.y_init-Block.padt[hold]-1,1,Block.prev_z)
+		x = round(gw / Block.prev_z)
 		y = Block.y_init - 1
-		hold && this.dp(hold,0,1,y-Block.padb[hold],1,pz)
-		c.fillRect(x*g*pz, 0, -((N+1)*preview+1)*g*pz, N*g*pz)
-		x -= 1
 		bag.slice(-preview).forEach((piece, i) => {
-			const padb = Block.padb[piece]
-			const padl = Block.padl[piece]
-			const padr = Block.padr[piece]
 			x += Block.padr[piece] - N
-			this.dp(piece,0,x,y-padb,void 0,pz)
-			x += padl - 1
+			this.dp(piece,0,x,y-Block.padt[piece],max(.1, 1-(preview-i-1)*.2),Block.prev_z)
+			x += Block.padl[piece] - 1
 		})
-		x = round(gw / pz - N)
+		x = round(gw / Block.prev_z - N)
 		this.status.innerHTML = `${
 			(this.score+'')}\n${
 			(this.lines+'')
@@ -741,8 +532,8 @@ class Block{
 		if(grav === void 0){ grav = this.grav }
 		else{
 			this.grav = grav
-			eid('grav') && (eid('grav').checked = grav)
-			eid('up') && (eid('up').style.visibility = grav ? 'hidden' : 'visible')
+			eid('grav').checked = grav
+			eid('up').style.visibility = grav ? 'hidden' : 'visible'
 		}
 		if(bpf !== void 0){
 			bpf = min(20, max(0, bpf))
@@ -771,10 +562,9 @@ class Block{
 	reset(revive=false){
 		this.bag = revive && this.store_get('bag')?.split(',') || []
 		this.hold = revive && this.store_get('hold') || void 0
-		this.lines = revive && parseInt(this.store_get('lines')) || 1280
+		this.lines = revive && parseInt(this.store_get('lines')) || 0
 		this.piece = void 0
 		this.score = revive && parseInt(this.store_get('score')) || 0
-		this.set_theme()
 		const delay = this.delay ?? 1000
 		const gh = this.gh = 20
 		const ghs = this.ghs = 3
@@ -800,7 +590,7 @@ class Block{
 		w = this.w = g * gw
 		const x = floor(rect.x)
 		const y = floor(rect.y)
-		const v_pad = rect.height - h
+		const v_pad = round(((rect.height - h) / 2))
 		const scale = window.devicePixelRatio
 		canvas.style.height = `${h}px`
 		canvas.height = h * scale
@@ -829,18 +619,15 @@ class Block{
 			this.y += kick[i][1]
 		}
 	}
-	set_theme(i){
-		i ??= floor(this.lines / Block.level) % 256
-		eid('theme').value = i
-		if(i < 138){ i %= 10 }
-		this.theme = themes[i]
-	}
 	store_get(k){
 		return this.storage?.getItem(appid+k)
 	}
 	store(k,v){
 		this.storage?.setItem(appid+k,v)
 	}
+}
+function rgb(a){
+	return `rgb(${a.join()})`
 }
 function shuffle(a){
 	for(let i = a.length - 1; i > 0; --i){
