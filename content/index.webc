@@ -20,6 +20,7 @@ description: Ship projects faster than your competitors!
 </nav>
 <nav class='blt hr'>
   <ul>
+    <li><a href='/demo/half'>Browser Dimensions</a>
     <li><a href='https://qchat.rizon.net/?channels=dailyship'>Chat</a>
     <li class='grow'><a href='https://github.com/hackdash/dailyship'>Code</a>
   </ul>
