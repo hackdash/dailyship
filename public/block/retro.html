@@ -62,11 +62,7 @@ input:focus{outline:1px solid;}
 .wide {width:100%;}
 input[type=checkbox]{margin:0 0 0 2px;}
 input[type=number]{direction:rtl;}
-#status {
-	padding-right:4px;
-	text-align:right;
-	white-space-collapse:preserve;
-}
+#status {white-space-collapse:preserve;}
 </style>
 <body autofocus tabindex='0'>
 <main class='row'>
@@ -74,11 +70,11 @@ input[type=number]{direction:rtl;}
 	<rect id='wall' fill='transparent' width='10' height='23'></rect>
 </svg>
 <div class='column bg2' style='min-width:7ch;width:var(--size);'>
-<div id='status'></div>
+<div id='status' class='text-btn'></div>
 <div class='fade grow column'>
 <label class='button text-btn'>
 	Level<br>
-	<input id='theme' class='wide' min='0' max='255' step='1' onChange='game.set_theme(Math.min(255,parseInt(this.value)));game.frame()' type='number' autocomplete='off'>
+	<input id='theme' class='wide' min='0' step='1' onChange='game.set_level(this.value)' type='number' autocomplete='off'>
 </label>
 <label class='button text-btn'>
 	<span class='hotkey'>G</span>rav<input id='grav' onChange='document.body.focus();game.gravitate(void 0, this.checked, true)' type='checkbox' autocomplete='off'>
@@ -573,9 +569,10 @@ class Block{
 			}
 			if(!(i % gw)){ count = 0 }
 		}
+		const level_delta = floor((this.lines + lines) / Block.level) - floor(this.lines / Block.level)
+		level_delta && this.set_theme(this.level + level_delta)
 		this.lines += lines
 		this.score += (Block.score[lines] ?? (100 * lines)) + (2 * (y - max(0, this.y)))
-		this.set_theme()
 		this.store('field',field.toBase64())
 		this.store('lines',this.lines)
 		this.store('score',this.score)
@@ -675,7 +672,7 @@ class Block{
 		this.lines = revive && parseInt(this.store_get('lines')) || 0
 		this.piece = void 0
 		this.score = revive && parseInt(this.store_get('score')) || 0
-		this.set_theme()
+		this.set_theme(floor(this.lines / Block.level))
 		const delay = this.delay ?? 1000
 		const gh = this.gh = 20
 		const ghs = this.ghs = 3
@@ -731,9 +728,14 @@ class Block{
 			this.y += kick[i][1]
 		}
 	}
+	set_level(level){
+		this.set_theme(parseInt(level))
+		this.frame()
+	}
 	set_theme(i){
-		i ??= floor(this.lines / Block.level) % 256
-		eid('theme').value = i
+		i ??= this.level
+		i %= 256
+		eid('theme').value = this.level = i
 		if(i <= 137){ i %= 10 }
 		if((i >= 192) && (i <= 201)){ i -= 192 }
 		if(i >= 202){ i -= 64 }
