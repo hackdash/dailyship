@@ -61,11 +61,7 @@ input:focus{outline:1px solid;}
 .wide {width:100%;}
 input[type=checkbox]{margin:0 0 0 2px;}
 input[type=number]{direction:rtl;}
-#status {
-	padding-right:4px;
-	text-align:right;
-	white-space-collapse:preserve;
-}
+#status {white-space-collapse:preserve;}
 </style>
 <body autofocus tabindex='0'>
 <main class='row'>
@@ -73,7 +69,7 @@ input[type=number]{direction:rtl;}
 	<rect id='wall' fill='transparent' width='10' height='23'></rect>
 </svg>
 <div class='column' style='min-width:7ch;width:var(--size);'>
-<div id='status'></div>
+<div id='status' class='text-btn'></div>
 <div class='fade grow column'>
 <label class='button text-btn'>
 	<span class='hotkey'>G</span>rav<input id='grav' onChange='document.body.focus();game.gravitate(void 0, this.checked, true)' type='checkbox' autocomplete='off'>
