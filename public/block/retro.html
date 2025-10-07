@@ -738,7 +738,7 @@ class Block{
 		}
 	}
 	set_level(level){
-		this.set_theme(parseInt(level))
+		this.set_theme(parseInt(level) || this.level || 0)
 		this.frame()
 	}
 	set_theme(i){
