@@ -5,9 +5,10 @@
 <style>
 * {box-sizing:border-box;}
 :root {
-	color-scheme:dark;
 	--bg:#787878;
 	--size:6vh;
+	accent-color:#404040;
+	color-scheme:dark;
 }
 body, html, main {height:100%;}
 body, button, input {
@@ -54,13 +55,13 @@ input:focus{outline:1px solid;}
 .hotkey {text-decoration:underline dotted;}
 .row {display:flex;}
 .text-btn {
-	padding:2px 0 2px 4px;
+	padding:2px 2px 2px 0;
+	text-align: right;
 }
 .uni-btn {line-height:0;}
 .wide {width:100%;}
+input[type=checkbox]{margin:0 0 0 2px;}
 input[type=number]{direction:rtl;}
-#delay {padding:0 4px 0 0;}
-#grav {margin:0 0 0 4px;}
 #status {
 	padding-right:4px;
 	text-align:right;
@@ -82,8 +83,8 @@ input[type=number]{direction:rtl;}
 <label class='button text-btn'>
 	<span class='hotkey'>G</span>rav<input id='grav' onChange='document.body.focus();game.gravitate(void 0, this.checked, true)' type='checkbox' autocomplete='off'>
 </label>
-<label class='button text-btn'>
-	<input id='bpf' min='0' max='20' step='1' onChange='game.gravitate(void 0, void 0, true, parseInt(this.value))' type='number' autocomplete='off'
+<label class='button text-btn row'>
+	<input id='bpf' class='grow' min='0' max='20' step='1' onChange='game.gravitate(void 0, void 0, true, parseInt(this.value))' type='number' autocomplete='off'
 	>G
 </label>
 <label class='button text-btn'>
@@ -262,7 +263,6 @@ const themes = {
 }
 class Block{
 	static level = 4
-	static skiplines = 120 * Block.level
 	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
 	static ppci = {1:0,2:2,3:1,4:0,5:2,6:0,7:1}
 	static ppco = {I:0,J:2,L:1,O:0,S:2,T:0,Z:1}
@@ -672,7 +672,7 @@ class Block{
 	reset(revive=false){
 		this.bag = revive && this.store_get('bag')?.split(',') || []
 		this.hold = revive && this.store_get('hold') || void 0
-		this.lines = revive && parseInt(this.store_get('lines')) || Block.skiplines
+		this.lines = revive && parseInt(this.store_get('lines')) || 0
 		this.piece = void 0
 		this.score = revive && parseInt(this.store_get('score')) || 0
 		this.set_theme()
@@ -694,16 +694,15 @@ class Block{
 	resize(){
 		const {c, canvas, ght, gw, sizer} = this
 		const rect = sizer.getBoundingClientRect()
-		let h = ceil(rect.height)
-		let w = ceil(rect.width)
-		let g = min(floor(h/ght), floor(w/gw))
+		let h = rect.height
+		let w = rect.width
+		let g = min(h/ght, w/gw)
 		const g8 = this.g8 = g/8
 		this.g = g
 		h = this.h = g * ght
 		w = this.w = g * gw
 		const x = floor(rect.x)
 		const y = floor(rect.y)
-		const v_pad = round((rect.height - h) / 2)
 		const scale = window.devicePixelRatio
 		canvas.style.height = `${h}px`
 		canvas.height = h * scale
@@ -711,7 +710,7 @@ class Block{
 		canvas.style.height = `${h}px`
 		canvas.style.width = `${w}px`
 		canvas.style.left = `${x}px`
-		canvas.style.top = `${y + v_pad}px`
+		canvas.style.top = `${y}px`
 		c.scale(scale, scale)
 		this.field && this.frame()
 	}

@@ -5,9 +5,10 @@
 <style>
 * {box-sizing:border-box;}
 :root {
-	color-scheme:dark;
 	--bg:#000;
 	--size:6vh;
+	accent-color:#404040;
+	color-scheme:dark;
 }
 body, html, main {height:100%;}
 body, button, input {
@@ -53,13 +54,13 @@ input:focus{outline:1px solid;}
 .hotkey {text-decoration:underline dotted;}
 .row {display:flex;}
 .text-btn {
-	padding:2px 0 2px 4px;
+	padding:2px 2px 2px 0;
+	text-align: right;
 }
 .uni-btn {line-height:0;}
 .wide {width:100%;}
+input[type=checkbox]{margin:0 0 0 2px;}
 input[type=number]{direction:rtl;}
-#delay {padding:0 4px 0 0;}
-#grav {margin:0 0 0 4px;}
 #status {
 	padding-right:4px;
 	text-align:right;
@@ -68,7 +69,7 @@ input[type=number]{direction:rtl;}
 </style>
 <body autofocus tabindex='0'>
 <main class='row'>
-<svg class='grow' viewBox='0 0 10 24'>
+<svg class='grow' viewBox='0 0 10 23'>
 	<rect id='wall' fill='transparent' width='10' height='23'></rect>
 </svg>
 <div class='column' style='min-width:7ch;width:var(--size);'>
@@ -77,8 +78,8 @@ input[type=number]{direction:rtl;}
 <label class='button text-btn'>
 	<span class='hotkey'>G</span>rav<input id='grav' onChange='document.body.focus();game.gravitate(void 0, this.checked, true)' type='checkbox' autocomplete='off'>
 </label>
-<label class='button text-btn'>
-	<input id='bpf' min='0' max='20' step='1' onChange='game.gravitate(void 0, void 0, true, parseInt(this.value))' type='number' autocomplete='off'
+<label class='button text-btn row'>
+	<input id='bpf' class='grow' min='0' max='20' step='1' onChange='game.gravitate(void 0, void 0, true, parseInt(this.value))' type='number' autocomplete='off'
 	>G
 </label>
 <label class='button text-btn'>
