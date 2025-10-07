@@ -697,8 +697,8 @@ class Block{
 		let h = ceil(rect.height)
 		let w = ceil(rect.width)
 		let g = min(floor(h/ght), floor(w/gw))
-		const g8 = this.g8 = max(1, floor(g/8))
-		g = this.g = g8 * 8
+		const g8 = this.g8 = g/8
+		this.g = g
 		h = this.h = g * ght
 		w = this.w = g * gw
 		const x = floor(rect.x)
