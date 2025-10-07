@@ -672,7 +672,7 @@ class Block{
 		this.lines = revive && parseInt(this.store_get('lines')) || 0
 		this.piece = void 0
 		this.score = revive && parseInt(this.store_get('score')) || 0
-		this.set_theme(floor(this.lines / Block.level))
+		this.set_theme(max(120, floor(this.lines / Block.level)))
 		const delay = this.delay ?? 1000
 		const gh = this.gh = 20
 		const ghs = this.ghs = 3
