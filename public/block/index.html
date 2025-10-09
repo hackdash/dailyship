@@ -42,13 +42,14 @@ input {background:0;border:0;border-radius:0;padding:0;}
 input:focus{outline:1px solid;}
 .button {border-style:outset;}
 .column {display:flex;flex-direction:column;}
+.ctrl, .ctrl svg {height:var(--size);}
 .ctrl {
+	-webkit-tap-highlight-color:transparent;
 	align-self: flex-end;
 	fill:#FFF;
-	height:var(--size);
 	padding:0;
 	user-select:none;
-	width:var(--size);
+	width:100%;
 }
 .fade {opacity:.5;}
 .grow {flex-grow:1;}
@@ -370,6 +371,7 @@ class Block{
 			case 'delay_increment':
 				delay = this.delay + 100
 			break
+			default: return
 		}
 		this.gravitate(delay, grav, true, bpf)
 	}

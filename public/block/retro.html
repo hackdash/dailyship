@@ -45,6 +45,7 @@ input:focus{outline:1px solid;}
 .column {display:flex;flex-direction:column;}
 .ctrl, .ctrl svg {height:var(--size);}
 .ctrl {
+	-webkit-tap-highlight-color:transparent;
 	align-self: flex-end;
 	fill:var(--pi_3C);
 	padding:0;
@@ -488,6 +489,7 @@ class Block{
 			case 'level_increment':
 				this.set_theme(this.level + 1)
 			break
+			default: return
 		}
 		this.gravitate(delay, grav, true, bpf)
 	}
