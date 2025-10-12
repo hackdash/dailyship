@@ -112,8 +112,6 @@ global.lfloz = global.floz_per_l = 33.814023
 # File approach
 If you're curious how other commands work, they are stored in files without an extension in a directory listed in the PATH environment variable.
 The Free Desktop standard recommends using a hidden folder in your home directory.
-I had higher hopes for `/usr/bin`, but the permissions really discouraged me.
-
 ## ~/.local/bin/calc
 ```
 node --require ~/scripts/calc.js
