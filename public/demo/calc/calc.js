@@ -63,6 +63,7 @@ global.hp = global.horsepower = 745.7
 global.inch = global.in_per_m = 2.54e-2
 global.inHg = 3386.39
 global.kilo = global.km = 1e3
+global.l = global.liter = 1e-3
 global.lb = global.kg_per_lb = 0.45359237
 global.lbft = 1.356
 global.league = 4828.032

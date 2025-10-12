@@ -70,7 +70,7 @@ Furthermore, we may render a number in scientific notation with `sci()` or conve
 Convert temperatures between Fahrenheit and Celsius with a precision of 3:
 ```
 global.fc = (x) => (x - 32) * 5/9
-global.fc3 = (x) => pr(3, fc(x))
+global.fc3 = (x) => pr3(fc(x))
 ```
 ```
 > fc(70.5)
@@ -78,16 +78,16 @@ global.fc3 = (x) => pr(3, fc(x))
 > fc3(70.5)
 '21.4'
 ```
-## Unit conversion
-Factors are stored for unit conversion, especially for determining what [U.S. units](https://en.wikipedia.org/wiki/United_States_customary_units) are in metric, however you can go in reverse.
+# Unit conversion
+Factors are stored for unit conversion, especially from [U.S. units](https://en.wikipedia.org/wiki/United_States_customary_units) to metric, however you can go in reverse.
 [GNU Units](https://www.gnu.org/software/units/manual/units.html) also helps to double check.
-The environment variable ensures that US units are used instead of the GB imperial counterparts.
+The environment variable ensures that US units are used instead of the GB imperial counterparts. Be aware that many units of volume are converted to liters `l` or milliliters `ml`,  but a liter is only `1e-3 m**3`. Due to the lossy nature floating point numbers, I've chosen to focus on values closer to zero when possible to retain precision.
 ```
 UNITS_ENGLISH=US units floz ml --verbose
 ```
 Since multiplication is one character, `*`, it is easier to use than function calls, since you don't have to type parentheses.
 Division might be apropos for dimensional analysis, but I am biased toward multiplication and putting numbers next to their units.
-I have provided some shorter forms for frequent typing and longer forms that make it more clear what they represent.
+I have provided some shorter forms for frequent typing and longer forms that make it more clear what values represent.
 ```
 global.lfloz = global.floz_per_l = 33.814023
 > 2*lfloz
