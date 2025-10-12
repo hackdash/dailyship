@@ -119,6 +119,9 @@ export PATH=$HOME/.local/bin:$PATH
 ```
 
 # Alternatives
+- [GNU Units](https://www.gnu.org/software/units/manual/units.html) for single unit conversion with any starting value.
+  - This environment variable ensures that US units are used instead of the GB imperial counterparts.
+  - `UNITS_ENGLISH=US units floz ml --verbose`
 - [PARI GP](https://pari.math.u-bordeaux.fr/) interactive shell: factorization, algebraic numbers and theory, elliptic curves, modular forms, L functions, matrices, polynomials, power series, transcendentals, numerical summation, and integration.
   - This has line numbers, and you can reuse results with `%`.
 - [Python](https://www.python.org/downloads/) interactive shell:
@@ -143,6 +146,3 @@ export PATH=$HOME/.local/bin:$PATH
     - Start container:
     - `alias sage="podman start --filter name=sagemathone"`
     - Retrieve the login token URL from the log in Pods and bookmark it in your web browser.
-  - [GNU Units](https://www.gnu.org/software/units/manual/units.html) for single unit conversion with any starting value.
-    - This environment variable ensures that US units are used instead of the GB imperial counterparts.
-    - `UNITS_ENGLISH=US units floz ml --verbose`
