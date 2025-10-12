@@ -276,60 +276,12 @@ for(const pi in palette){
 	document.documentElement.style.setProperty(k, palette[pi])
 }
 class Block{
-	static level = 4
 	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
+	static level = 120
+	static lines_per_level = 4
 	static ppci = {1:0,2:2,3:1,4:0,5:2,6:0,7:1}
 	static ppco = {I:0,J:2,L:1,O:0,S:2,T:0,Z:1}
 	static prev_z = 1/4
-	static score = {
-		1: 100,
-		2: 300,
-		3: 500,
-		4: 800,
-	}
-	static kick = {
-		'I01':[[0,0],[-2,0],[ 1, 0],[-2, 1],[ 1,-2]],
-		'I03':[[0,0],[-1,0],[ 2, 0],[-1,-2],[ 2, 1]],
-		'I10':[[0,0],[ 2,0],[-1, 0],[ 2,-1],[-1, 2]],
-		'I12':[[0,0],[-1,0],[ 2, 0],[-1,-2],[ 2, 1]],
-		'I21':[[0,0],[ 1,0],[-2, 0],[ 1, 2],[-2,-1]],
-		'I23':[[0,0],[ 2,0],[-1, 0],[ 2,-1],[-1, 2]],
-		'I30':[[0,0],[ 1,0],[-2, 0],[ 1, 2],[-2,-1]],
-		'I32':[[0,0],[-2,0],[ 1, 0],[-2, 1],[ 1,-2]],
-		'J01':[[0,0],[-1,0],[-1,-1],[ 0, 2],[-1, 2]],
-		'J03':[[0,0],[ 1,0],[ 1,-1],[ 0, 2],[ 1, 2]],
-		'J10':[[0,0],[ 1,0],[ 1, 1],[ 0,-2],[ 1,-2]],
-		'J12':[[0,0],[ 1,0],[ 1, 1],[ 0,-2],[ 1,-2]],
-		'J21':[[0,0],[-1,0],[-1,-1],[ 0, 2],[-1, 2]],
-		'J23':[[0,0],[ 1,0],[ 1,-1],[ 0, 2],[ 1, 2]],
-		'J30':[[0,0],[-1,0],[-1, 1],[ 0,-2],[-1,-2]],
-		'J32':[[0,0],[-1,0],[-1, 1],[ 0,-2],[-1,-2]],
-	}
-	static pr = {I:0,J:2,L:2,O:0,S:0,T:2,Z:0}
-	static pb = {
-		I: [0b00011110000, 0b100010001000100, 0b111100000000, 0b10001000100010],
-		J: [0b00001110001, 0b000001000100110, 0b010001110000, 0b00001100100010],
-		L: [0b00001110100, 0b000011000100010, 0b000101110000, 0b00001000100011],
-		O: [0b11001100000, 0b000011001100000, 0b011001100000, 0b00011001100000],
-		S: [0b00000110110, 0b000010001100010, 0b001101100000, 0b00001000110001],
-		T: [0b00001110010, 0b000001001100010, 0b001001110000, 0b00001000110010],
-		Z: [0b00001100011, 0b000001001100100, 0b011000110000, 0b00000100110010],
-	}
-	static padb = {I:2,J:2,L:2,O:2,S:1,T:2,Z:1}
-	static padl = {I:0,J:0,L:0,O:1,S:0,T:0,Z:0}
-	static padr = {I:0,J:1,L:1,O:1,S:1,T:1,Z:1}
-	static padt = {I:1,J:1,L:1,O:1,S:0,T:1,Z:0}
-	static y_init = 0
-	static y_min = {
-		I: [-1, -4, -1, -4],
-		J: [-2, -3, -2, -3],
-		L: [-2, -3, -2, -3],
-		O: [-2, -2, -2, -2],
-		S: [-2, -3, -2, -3],
-		T: [-2, -3, -2, -3],
-		Z: [-2, -3, -2, -3],
-	}
-	static pieces = Object.keys(Block.pb)
 	static keymap = {
 		'ArrowDown': 'down',
 		'ArrowLeft': 'left',
@@ -383,6 +335,55 @@ class Block{
 		'ShiftLeft': 'hold',
 		'ShiftRight': 'hold',
 		'Space': 'drop',
+	}
+	static kick = {
+		'I01':[[0,0],[-2,0],[ 1, 0],[-2, 1],[ 1,-2]],
+		'I03':[[0,0],[-1,0],[ 2, 0],[-1,-2],[ 2, 1]],
+		'I10':[[0,0],[ 2,0],[-1, 0],[ 2,-1],[-1, 2]],
+		'I12':[[0,0],[-1,0],[ 2, 0],[-1,-2],[ 2, 1]],
+		'I21':[[0,0],[ 1,0],[-2, 0],[ 1, 2],[-2,-1]],
+		'I23':[[0,0],[ 2,0],[-1, 0],[ 2,-1],[-1, 2]],
+		'I30':[[0,0],[ 1,0],[-2, 0],[ 1, 2],[-2,-1]],
+		'I32':[[0,0],[-2,0],[ 1, 0],[-2, 1],[ 1,-2]],
+		'J01':[[0,0],[-1,0],[-1,-1],[ 0, 2],[-1, 2]],
+		'J03':[[0,0],[ 1,0],[ 1,-1],[ 0, 2],[ 1, 2]],
+		'J10':[[0,0],[ 1,0],[ 1, 1],[ 0,-2],[ 1,-2]],
+		'J12':[[0,0],[ 1,0],[ 1, 1],[ 0,-2],[ 1,-2]],
+		'J21':[[0,0],[-1,0],[-1,-1],[ 0, 2],[-1, 2]],
+		'J23':[[0,0],[ 1,0],[ 1,-1],[ 0, 2],[ 1, 2]],
+		'J30':[[0,0],[-1,0],[-1, 1],[ 0,-2],[-1,-2]],
+		'J32':[[0,0],[-1,0],[-1, 1],[ 0,-2],[-1,-2]],
+	}
+	static padb = {I:2,J:2,L:2,O:2,S:1,T:2,Z:1}
+	static padl = {I:0,J:0,L:0,O:1,S:0,T:0,Z:0}
+	static padr = {I:0,J:1,L:1,O:1,S:1,T:1,Z:1}
+	static padt = {I:1,J:1,L:1,O:1,S:0,T:1,Z:0}
+	static pb = {
+		I: [0b00011110000, 0b100010001000100, 0b111100000000, 0b10001000100010],
+		J: [0b00001110001, 0b000001000100110, 0b010001110000, 0b00001100100010],
+		L: [0b00001110100, 0b000011000100010, 0b000101110000, 0b00001000100011],
+		O: [0b11001100000, 0b000011001100000, 0b011001100000, 0b00011001100000],
+		S: [0b00000110110, 0b000010001100010, 0b001101100000, 0b00001000110001],
+		T: [0b00001110010, 0b000001001100010, 0b001001110000, 0b00001000110010],
+		Z: [0b00001100011, 0b000001001100100, 0b011000110000, 0b00000100110010],
+	}
+	static pieces = Object.keys(Block.pb)
+	static pr = {I:0,J:2,L:2,O:0,S:0,T:2,Z:0}
+	static score = {
+		1: 100,
+		2: 300,
+		3: 500,
+		4: 800,
+	}
+	static y_init = 0
+	static y_min = {
+		I: [-1, -4, -1, -4],
+		J: [-2, -3, -2, -3],
+		L: [-2, -3, -2, -3],
+		O: [-2, -2, -2, -2],
+		S: [-2, -3, -2, -3],
+		T: [-2, -3, -2, -3],
+		Z: [-2, -3, -2, -3],
 	}
 	static ccw(i){ return (i + N-1) % N }
 	static cw(i){ return (i+1) % N }
@@ -511,29 +512,45 @@ class Block{
 		return !(pd & region)
 	}
 	dc(x, y, ti, opacity=1, z=1){
-		const {c,g,g8,ghs,theme} = this
-		const pi = theme[ti]
-		const pi_0 = theme[0]
-		const pi_2 = theme[2]
+		const {c,g,g16,g8,ghs,theme} = this
+		const pi = theme[ti], pi_0 = theme[0], pi_2 = theme[2]
+		let xi, yi
 		y += ghs
 		c.save()
 		c.globalAlpha = opacity
-		c.fillStyle = palette[0x0F]
-		c.fillRect(g*x*z, g*y*z, g*z, g*z)
 		if(!ti){
-			c.fillStyle = palette[pi_2]
-			c.fillRect(x*g*z, y*g*z, 7*g8*z, 7*g8*z)
+			c.beginPath()
+			c.moveTo((xi=x*g+g8)*z, (yi=y*g+g16)*z)
+			c.lineTo((xi+=11*g16)*z, yi*z)
+			c.lineTo(xi*z, (yi+=12*g16)*z)
+			c.lineTo((xi-=12*g16)*z, yi*z)
+			c.lineTo(xi*z, (yi-11*g16)*z)
+			c.lineWidth = g8 * z
+			c.strokeStyle = palette[pi_2]
+			c.stroke()
 		}
 		c.fillStyle = palette[pi]
 		!ti && (pi_2 !== pi) && c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
 		if(ti){
-			c.fillRect(g*x*z, g*y*z, 7*g8*z, 7*g8*z)
+			c.beginPath()
+			c.moveTo((xi=x*g+g8)*z, (yi=y*g)*z)
+			c.lineTo((xi+=6*g8)*z, yi*z)
+			c.lineTo(xi*z, (yi+=7*g8)*z)
+			c.lineTo((xi-=7*g8)*z, yi*z)
+			c.lineTo(xi*z, (yi-=6*g8)*z)
+			c.lineTo((xi+=g8)*z, yi*z)
+			c.fill()
 		}
 		if(ti && (pi_0 !== pi)){
 			c.fillStyle = palette[pi_0]
-			c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, g8*z, g8*z)
-			c.fillRect((1 + x*8)*g8*z, (2 + y*8)*g8*z, g8*z, g8*z)
-			c.fillRect((2 + x*8)*g8*z, (1 + y*8)*g8*z, g8*z, g8*z)
+			c.beginPath()
+			c.moveTo((xi=(x*g+g8)*z)*z, (yi=(y*g+g8)*z)*z)
+			c.lineTo((xi+=2*g8)*z, yi*z)
+			c.lineTo(xi*z, (yi+=g8)*z)
+			c.lineTo((xi-=g8)*z, yi*z)
+			c.lineTo(xi*z, (yi+=g8)*z)
+			c.lineTo((xi-=g8)*z, yi*z)
+			c.fill()
 		}
 		if(pi_0 !== pi_2){
 			c.fillStyle = palette[pi_0]
@@ -597,7 +614,7 @@ class Block{
 			}
 			if(!(i % gw)){ count = 0 }
 		}
-		const level_delta = floor((this.lines + lines) / Block.level) - floor(this.lines / Block.level)
+		const level_delta = floor((this.lines + lines) / Block.lines_per_level) - floor(this.lines / Block.lines_per_level)
 		level_delta && this.set_theme(this.level + level_delta)
 		this.lines += lines
 		this.score += (Block.score[lines] ?? (100 * lines)) + (2 * (y - max(0, this.y)))
@@ -700,7 +717,7 @@ class Block{
 		this.lines = revive && parseInt(this.store_get('lines')) || 0
 		this.piece = void 0
 		this.score = revive && parseInt(this.store_get('score')) || 0
-		this.set_theme(max(120, floor(this.lines / Block.level)))
+		this.set_theme(Block.level + this.lines / Block.lines_per_level)
 		const delay = this.delay ?? 1000
 		const gh = this.gh = 20
 		const ghs = this.ghs = 3
@@ -723,6 +740,7 @@ class Block{
 		let w = rect.width
 		let g = min(h/ght, w/gw)
 		const g8 = this.g8 = g/8
+		this.g16 = g/16
 		this.g = g
 		h = this.h = g * ght
 		w = this.w = g * gw
@@ -761,8 +779,8 @@ class Block{
 		this.frame()
 	}
 	set_theme(i){
-		i ??= this.level
-		i = (i + 256) % 256
+		i ??= this.level ?? Block.level
+		i = floor((i + 256) % 256)
 		eid('theme').value = this.level = i
 		if(i <= 137){ i %= 10 }
 		if((i >= 192) && (i <= 201)){ i -= 192 }
