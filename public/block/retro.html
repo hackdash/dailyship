@@ -544,7 +544,7 @@ class Block{
 		if(ti && (pi_0 !== pi)){
 			c.fillStyle = palette[pi_0]
 			c.beginPath()
-			c.moveTo((xi=(x*g+g8)*z)*z, (yi=(y*g+g8)*z)*z)
+			c.moveTo((xi=(x*g+g8))*z, (yi=(y*g+g8))*z)
 			c.lineTo((xi+=2*g8)*z, yi*z)
 			c.lineTo(xi*z, (yi+=g8)*z)
 			c.lineTo((xi-=g8)*z, yi*z)
@@ -774,18 +774,20 @@ class Block{
 			this.y += kick[i][1]
 		}
 	}
-	set_level(level){
-		this.set_theme(parseInt(level) || this.level || 0)
+	set_level(t){
+		t = parseInt(t)
+		if(isNaN(t)) return
+		this.set_theme(t)
 		this.frame()
 	}
-	set_theme(i){
-		i ??= this.level ?? Block.level
-		i = floor((i + 256) % 256)
-		eid('theme').value = this.level = i
-		if(i <= 137){ i %= 10 }
-		if((i >= 192) && (i <= 201)){ i -= 192 }
-		if(i >= 202){ i -= 64 }
-		this.theme = themes[i]
+	set_theme(t){
+		t ??= this.level ?? Block.level
+		t = floor((t + 256) % 256)
+		eid('theme').value = this.level = t
+		if(t <= 137){ t %= 10 }
+		if((t >= 192) && (t <= 201)){ t -= 192 }
+		if(t >= 202){ t -= 64 }
+		this.theme = themes[t]
 	}
 	store_get(k){
 		return this.storage?.getItem(appid+k)
