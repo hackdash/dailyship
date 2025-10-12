@@ -80,10 +80,11 @@ global.fc3 = (x) => pr3(fc(x))
 ```
 # Unit conversion
 Factors are stored for unit conversion, especially from [U.S. units](https://en.wikipedia.org/wiki/United_States_customary_units) to metric, however you can go in reverse.
-Be aware that many units of volume are converted to liters `l` or milliliters `ml`,  but a liter is only `1e-3 m**3`. Due to the lossy nature floating point numbers, I've chosen to focus on values closer to zero when possible to retain precision.
+Be aware that many units of volume are converted to liters `l` or milliliters `ml`,  but a liter is only `1e-3 m**3`.
+Due to the lossy nature floating point numbers, I've chosen to focus on values closer to zero when possible to retain precision.
 Since multiplication is one character, `*`, it is easier to use than function calls, since you don't have to type parentheses.
-Division might be apropos for dimensional analysis, but I am biased toward multiplication and putting numbers next to their units.
-I have provided some shorter forms for frequent typing and longer forms that make it more clear what values represent.
+Division might be apropos for dimensional analysis, but I prefer multiplication and putting numbers alongside their units.
+Provided are some shorter forms for frequent typing and longer forms that make it more clear what values represent.
 ```
 global.lfloz = global.floz_per_l = 33.814023
 > 2*lfloz
