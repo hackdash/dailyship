@@ -134,11 +134,11 @@ export PATH=$HOME/.local/bin:$PATH
   - Import any other Python package.
   - *Note that indentation and upfront looops are not ideal for terminal sessions.*
 - [Jupyter Notebook](https://jupyter-notebook.readthedocs.io/) & [SageMath](https://www.sagemath.org/)
-  - Another Python option with a web interface and folder structure, so you can save and organize every input you ever made.
-  There are different ways of installing Jupyter Notebook, but I found one bundled with SageMath, which provides yet another option.
+  - Another Python-based option with web interface and folder structure to save and organize every input you ever made.
+  - There are different ways of installing Jupyter Notebook, but I found a container bundled with SageMath, which provides yet another option.
   (You get a choice of Python or Sagemath for each notebook file.)
-  - https://github.com/sagemath/docker-images
-    - Note that containers are harder to run than normal programs, but Podman works well.
+  - [SageMath containers repo](https://github.com/sagemath/docker-images)
+    - Note that containers are harder to run than normal programs, but Podman works well if you don't use Docker.
     - [Pods](https://flathub.org/en/apps/com.github.marhkb.Pods) graphical Podman app.
     - [Podman](https://docs.podman.io/en/latest/) container tool.
     - Download the image:
