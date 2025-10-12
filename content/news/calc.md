@@ -80,11 +80,7 @@ global.fc3 = (x) => pr3(fc(x))
 ```
 # Unit conversion
 Factors are stored for unit conversion, especially from [U.S. units](https://en.wikipedia.org/wiki/United_States_customary_units) to metric, however you can go in reverse.
-[GNU Units](https://www.gnu.org/software/units/manual/units.html) also helps to double check.
-The environment variable ensures that US units are used instead of the GB imperial counterparts. Be aware that many units of volume are converted to liters `l` or milliliters `ml`,  but a liter is only `1e-3 m**3`. Due to the lossy nature floating point numbers, I've chosen to focus on values closer to zero when possible to retain precision.
-```
-UNITS_ENGLISH=US units floz ml --verbose
-```
+Be aware that many units of volume are converted to liters `l` or milliliters `ml`,  but a liter is only `1e-3 m**3`. Due to the lossy nature floating point numbers, I've chosen to focus on values closer to zero when possible to retain precision.
 Since multiplication is one character, `*`, it is easier to use than function calls, since you don't have to type parentheses.
 Division might be apropos for dimensional analysis, but I am biased toward multiplication and putting numbers next to their units.
 I have provided some shorter forms for frequent typing and longer forms that make it more clear what values represent.
@@ -146,3 +142,6 @@ export PATH=$HOME/.local/bin:$PATH
     - Start container:
     - `alias sage="podman start --filter name=sagemathone"`
     - Retrieve the login token URL from the log in Pods and bookmark it in your web browser.
+  - [GNU Units](https://www.gnu.org/software/units/manual/units.html) for single unit conversion with any starting value.
+    - This environment variable ensures that US units are used instead of the GB imperial counterparts.
+    - `UNITS_ENGLISH=US units floz ml --verbose`
