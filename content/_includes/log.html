@@ -3,5 +3,7 @@ layout: page
 ---
 <h1>{{title}}</h1>
 <p class='date'>{{date | dateString}}</p>
-
+{% if updated %}
+<p class='date'>{{updated | dateString}} Updated</p>
+{% endif %}
 {{content}}
