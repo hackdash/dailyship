@@ -546,7 +546,7 @@ class Block{
 			c.beginPath()
 			c.moveTo((xi=x*g+g8+g16)*z, (yi=y*g+3*g8)*z)
 			c.lineTo(xi*z, (yi-=g8+g16)*z)
-			c.lineTo((xi+g8)+g16*z, yi*z)
+			c.lineTo((xi+g8+g16)*z, yi*z)
 			c.stroke()
 		}
 		if(pi_0 !== pi_2){
