@@ -518,15 +518,15 @@ class Block{
 		y += ghs
 		c.save()
 		c.globalAlpha = opacity
+		c.lineWidth = g8 * z
 		if(!ti){
+			c.strokeStyle = palette[pi_2]
 			c.beginPath()
 			c.moveTo((xi=x*g+g8)*z, (yi=y*g+g16)*z)
 			c.lineTo((xi+=11*g16)*z, yi*z)
 			c.lineTo(xi*z, (yi+=12*g16)*z)
 			c.lineTo((xi-=12*g16)*z, yi*z)
 			c.lineTo(xi*z, (yi-11*g16)*z)
-			c.lineWidth = g8 * z
-			c.strokeStyle = palette[pi_2]
 			c.stroke()
 		}
 		c.fillStyle = palette[pi]
@@ -542,15 +542,12 @@ class Block{
 			c.fill()
 		}
 		if(ti && (pi_0 !== pi)){
-			c.fillStyle = palette[pi_0]
+			c.strokeStyle = palette[pi_0]
 			c.beginPath()
-			c.moveTo((xi=(x*g+g8))*z, (yi=(y*g+g8))*z)
-			c.lineTo((xi+=2*g8)*z, yi*z)
-			c.lineTo(xi*z, (yi+=g8)*z)
-			c.lineTo((xi-=g8)*z, yi*z)
-			c.lineTo(xi*z, (yi+=g8)*z)
-			c.lineTo((xi-=g8)*z, yi*z)
-			c.fill()
+			c.moveTo((xi=x*g+g8+g16)*z, (yi=y*g+3*g8)*z)
+			c.lineTo(xi*z, (yi-=g8+g16)*z)
+			c.lineTo((xi+g8)+g16*z, yi*z)
+			c.stroke()
 		}
 		if(pi_0 !== pi_2){
 			c.fillStyle = palette[pi_0]
