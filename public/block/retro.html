@@ -514,12 +514,13 @@ class Block{
 	dc(x, y, ti, opacity=1, z=1){
 		const {c,g,g16,g8,ghs,theme} = this
 		const pi = theme[ti], pi_0 = theme[0], pi_2 = theme[2]
+		const z2 = (pi_0 == pi_2), m0 = (pi_0 == pi)
 		let xi, yi
 		y += ghs
 		c.save()
 		c.globalAlpha = opacity
 		c.lineWidth = g8 * z
-		if(!ti){
+		if(!ti && !z2){
 			c.strokeStyle = palette[pi_2]
 			c.beginPath()
 			c.moveTo((xi=x*g+g8)*z, (yi=y*g+g16)*z)
@@ -530,8 +531,8 @@ class Block{
 			c.stroke()
 		}
 		c.fillStyle = palette[pi]
-		!ti && (pi_2 !== pi) && c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
-		if(ti){
+		!ti && !z2 && c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
+		if(ti && !m0){
 			c.beginPath()
 			c.moveTo((xi=x*g+g8)*z, (yi=y*g)*z)
 			c.lineTo((xi+=6*g8)*z, yi*z)
@@ -549,9 +550,12 @@ class Block{
 			c.lineTo((xi+g8+g16)*z, yi*z)
 			c.stroke()
 		}
-		if(pi_0 !== pi_2){
+		if(!z2 || !m0){
 			c.fillStyle = palette[pi_0]
 			c.fillRect(x*g*z, y*g*z, g8*z, g8*z)
+		}
+		if(z2 && m0){
+			c.fillRect(x*g*z, y*g*z, 7*g8*z, 7*g8*z)
 		}
 		c.restore()
 	}
@@ -626,7 +630,6 @@ class Block{
 		const bag_length = bag.length
 		c.clearRect(0, 0, w, h)
 		c.fillStyle = palette[0x0F]
-		// c.fillRect(0, ghs*g, w, gh*g)
 		for(let i=gs-1; i>=0; --i){
 			field[i] && this.dc(i % gw, floor(i / gw), Block.ppci[field[i]])
 		}
