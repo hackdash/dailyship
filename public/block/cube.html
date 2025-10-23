@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
-<title>Cube Block</title>
+<title>Block Cube</title>
 <style>
 * {box-sizing:border-box;}
 :root {
@@ -202,14 +202,14 @@ class Block{
 		bg: [0,0,0],
 		cbg: [0,0,0],
 		I: [112,112,112],
-		J: [0,0,224],
+		J: [32,32,255],
 		L: [255,215,0],
 		O: [255,140,0],
 		S: [0,128,0],
 		T: [224,224,224],
 		Z: [192,0,0],
 		1: [112,112,112],
-		2: [0,0,224],
+		2: [32,32,255],
 		3: [255,215,0],
 		4: [255,140,0],
 		5: [0,128,0],
@@ -396,6 +396,8 @@ class Block{
 	dc(x, y, co, opacity=1, grad=false, z=1){
 		const {c,cm,cm2,cr,g,ghs} = this
 		y += ghs
+		c.save()
+		c.globalAlpha = opacity
 		c.fillStyle = rgb(this.color.cbg)
 		c.beginPath()
 		c.roundRect(g*(x)*z, g*(y)*z, g*z, g*z, g*cr*z)
@@ -404,6 +406,7 @@ class Block{
 		c.beginPath()
 		c.roundRect(g*(x+cm2)*z, g*(y+cm2)*z, g*(1-cm)*z, g*(1-cm)*z, g*cr*z)
 		c.fill()
+		c.restore()
 	}
 	dp(piece, rot, x, y, opacity, z){
 		const {color} = this
@@ -469,12 +472,14 @@ class Block{
 		this.store('score',this.score)
 	}
 	frame(){
-		const {c,color,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,w} = this
+		const {c,cr,color,field,g,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,w} = this
 		let {bag,piece,rot,x,y} = this
 		const bag_length = bag.length
 		c.clearRect(0, 0, w, h)
 		c.fillStyle = rgb(color.bg)
-		c.fillRect(0, ghs*g, w, gh*g)
+		c.beginPath()
+		c.roundRect(0, ghs*g, w, gh*g, g*cr)
+		c.fill()
 		for(let i=gs-1; i>=0; --i){
 			field[i] && this.dc(i % gw, floor(i / gw), color[field[i]])
 		}
@@ -509,7 +514,7 @@ class Block{
 		y = Block.y_init - 1
 		bag.slice(-preview).forEach((piece, i) => {
 			x += Block.padr[piece] - N
-			this.dp(piece,0,x,y-Block.padt[piece],max(.1, 1-(preview-i-1)*.2),Block.prev_z)
+			this.dp(piece,0,x,y-Block.padt[piece],1,Block.prev_z)
 			x += Block.padl[piece] - 1
 		})
 		x = round(gw / Block.prev_z - N)
