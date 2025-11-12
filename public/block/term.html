@@ -1,0 +1,680 @@
+<!doctype html>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
+<title>Term Block</title>
+<style>
+* {box-sizing:border-box;}
+:root {
+	--pad: 0px;
+	--size:6vh;
+	accent-color:var(--pi_ui);
+	color-scheme:dark;
+}
+body, html, main {height:100%;}
+body, button, input {
+	color: var(--pi_ui);
+	font-family:'Roboto Mono','Noto Mono',monospace,system-ui;
+	font-size:clamp(10px,2vw,16px);
+	line-height:1.5;
+}
+body {
+	background:var(--pi_bg);
+	border-left: transparent 1px solid;
+	display:flex;
+	flex-direction:column;
+	flex:1;
+	margin:0;
+	overflow:hidden;
+}
+body:focus {border-color:var(--pi_ui);}
+button, label, input {
+	cursor:pointer;
+	touch-action:manipulation;
+	user-select:none;
+}
+input[type=checkbox]{height:1em;width:1em;}
+button, .button {
+	background:0;
+	border-color:rgba(127,127,127,.5);
+	border-width:1px;
+}
+hr {border-color:var(--pi_ui); opacity:.1; border-width:0 1px 0 0;}
+input {background:0;border:0;border-radius:0;padding:0;}
+input:focus{outline:1px solid;}
+.bg2 {background:var(--pi_bg);}
+.button {border-style:outset;}
+.column {display:flex;flex-direction:column;}
+.ctrl, .ctrl svg {height:var(--size);}
+.ctrl {
+	-webkit-tap-highlight-color:transparent;
+	align-self: flex-end;
+	fill:var(--pi_ui);
+	padding:0;
+	user-select:none;
+	width:100%;
+}
+.fade {opacity:.5;}
+.grow {flex-grow:1;}
+.hotkey {text-decoration:underline dotted;}
+.hi {
+	color:var(--pi_ui);
+	fill:var(--pi_ui);
+}
+.row {display:flex;}
+.text-btn {
+	padding:2px 2px 2px 0;
+	text-align: right;
+}
+.uni-btn {line-height:0;}
+.wide {width:100%;}
+input[type=checkbox]{margin:0 0 0 2px;}
+input[type=number]{direction:rtl;}
+#status {white-space-collapse:preserve;}
+</style>
+<body autofocus tabindex='0'>
+<main class='row'>
+<svg class='grow' viewBox='0 0 88 184'>
+	<defs>
+		<rect id='p' style='fill:var(--pi_ui)' height='1' width='1'/>
+	</defs>
+	<rect id='wall' x='4' width='80' height='184' fill='transparent'></rect>
+	<g id='grid' transform='translate(0,24)'></g>
+</svg>
+<div class='column bg2' style='min-width:7ch;width:var(--size);'>
+<div id='status' class='text-btn'></div>
+<div class='grow column'>
+<label class='button text-btn'>
+	Theme<br>
+	<input id='theme' class='wide' min='0' step='1' onChange='game.set_level(this.value)' type='number' autocomplete='off'>
+</label>
+<button class='fade ctrl' onPointerDown="game.input('level_increment')">
+	Next
+</button>
+<label class='fade button text-btn'>
+	<span class='hotkey'>G</span>rav<input id='grav' onChange='document.body.focus();game.gravitate(void 0, this.checked, true)' type='checkbox' autocomplete='off'>
+</label>
+<label class='fade button text-btn row'>
+	<input id='bpf' class='grow' min='0' max='20' step='1' onChange='game.gravitate(void 0, void 0, true, parseInt(this.value))' type='number' autocomplete='off'
+	>G
+</label>
+<label class='fade button text-btn'>
+	Delay<br>
+	<input id='delay' class='wide' min='0' step='.1' onChange='game.gravitate(1000 * parseFloat(this.value), void 0, true)' type='number' autocomplete='off'>
+</label>
+<button title='Reset' class='fade ctrl' style='fill:var(--pi_ui);' onClick='document.body.focus();game.reset()'>
+	<svg viewBox="0 0 128 128">
+		<path d="M108.46,63.96v-25.7c0-1.8-1.7-2.9-3-2l-35,24.4v-22.4c0.13-1.13-0.69-2.15-1.82-2.28
+		c-0.45-0.05-0.9,0.05-1.28,0.28l-36.9,25.1v-23.5c0-1.05-0.85-1.9-1.9-1.9h0h-10.2c-1.05,0-1.9,0.85-1.9,1.9l0,0v52.3
+		c0,1.05,0.85,1.9,1.9,1.9h0h10.3c1.05,0,1.9-0.85,1.9-1.9l0,0v-23.6l36.9,25c0.98,0.58,2.24,0.26,2.82-0.72
+		c0.23-0.39,0.33-0.84,0.28-1.28v-22.3l35,24.4c1.4,0.9,3-0.2,3-2L108.46,63.96z"/>
+	</svg>
+</button>
+<button title='Controls' class='fade ctrl' onClick="document.querySelectorAll('.touch').forEach(el=>el.hidden=!el.hidden);let t=eid('touch');t.checked=!t.checked;t.checked||document.body.focus();">
+	&vellip;
+	<input id='touch' checked hidden type='checkbox'>
+</button>
+<hr class='grow'>
+<button onPointerDown="game.input('left')" class='ctrl touch' aria-label='Left'>
+	<svg viewBox="0 0 128 128">
+		<path d="M83.72,62.21v-25.7c0.03-1.25-0.96-2.28-2.21-2.31c-0.42-0.01-0.83,0.1-1.19,0.31l-43.5,25.7c-1.13,0.72-1.47,2.22-0.75,3.35c0.19,0.3,0.45,0.55,0.75,0.75l43.5,25.6c1.08,0.63,2.46,0.27,3.09-0.81c0.21-0.36,0.32-0.77,0.31-1.19V62.21z"/>
+	</svg>
+</button>
+<button onPointerDown="game.input('right')" class='ctrl touch' aria-label='Right'>
+	<svg viewBox="0 0 128 128">
+		<path d="M43.7,62.21v-25.7c-0.03-1.25,0.96-2.28,2.21-2.31c0.42-0.01,0.83,0.1,1.19,0.31l43.5,25.7c1.13,0.72,1.47,2.22,0.75,3.35c-0.19,0.3-0.45,0.55-0.75,0.75l-43.5,25.6c-1.08,0.63-2.46,0.27-3.09-0.81c-0.21-0.36-0.32-0.77-0.31-1.19V62.21z"/>
+	</svg>
+</button>
+<button onPointerDown="game.input('reverse')" class='ctrl touch' aria-label='Reverse'>
+	<div class='hi uni-btn' style='font-size:var(--size);'>&#x21b6;</div>
+</button>
+<button onPointerDown="game.input('rotate')" class='ctrl touch' aria-label='Rotate'>
+	<div class='hi uni-btn' style='font-size:var(--size);'>&#x21b7;</div>
+</button>
+<button onPointerDown="game.input('hold')" class='ctrl touch' aria-label='Hold'>
+	<svg viewBox="-16 -16 160 160">
+		<path d="M27.3,36.56c0,0,19.47,10.45,20.59,10.95c1.12,0.51,2.64-0.2,3.35-1.83c0.71-1.62,11.16-21.1,11.66-21.91s0.91-2.33,2.74-1.52s4.16-5.27,4.16-5.27L51.13,6.03L41.9,7.25L26.59,34.94L27.3,36.56z"/>
+		<path d="M26.38,84.33c0,0,27.18,0.3,28.81,0.3c1.62,0,3.14,0.41,3.35,2.54c0.2,2.13-0.2,26.37-0.2,26.37l-10.45,0.1l-15.52-0.71l-8.32-3.45l-6.49-15.11L26.38,84.33z"/>
+		<path d="M107.73,43.86c0,0-21.2,12.48-21.71,12.78s-1.12,1.32-0.2,2.94s11.06,20.08,11.87,21.5c0.81,1.42,1.72,3.14,0.3,4.16c-1.42,1.01,2.13,4.67,2.13,4.67l10.04-1.12l6.8-4.36l5.07-8.42c0,0-0.91-9.94-1.12-10.24c-0.2-0.3-9.43-18.97-9.43-18.97L107.73,43.86z"/>
+		<path d="M75.45,37.56c0,0-10.57-16.32-13.97-20.17c-2.67-3.03-5.55-5.51-8.07-7.56c-2.28-1.85-3.95-2.19-5.93-1.88c-3.12,0.49-4.94,1.99-6.69,4.97C35.52,21.87,27.3,36.56,27.3,36.56s-2.89-0.91-2.94-2.84C24.3,31.88,36.12,11.81,37.34,9.68c1.22-2.13,3.25-4.87,8.82-5.17S80.95,4,82.57,4.31s5.38,1.83,8.82,7.1c3.94,6.03,6.45,11.38,6.45,11.38s7.75-4.59,8.56-4.08c1.22,0.76-10.81,24.33-11.77,25.15c-0.6,0.52-27.69,2.23-28.3,0.71C65.94,43.56,75.45,37.56,75.45,37.56z"/>
+		<path d="M107.73,43.86c0,0,1.43-1.27,2.57-0.92c1.14,0.36,11.67,22.88,12.72,25.08c1.06,2.2,1.67,7.48-1.58,12.76c-3.26,5.28-18.92,28.87-20.07,30.28c-1.14,1.41-1.76,2.64-4.93,2.64c-3.17,0-15.14-0.18-15.14-0.18s-0.44,8.89-0.53,9.68s-1.41,1.32-2.29-0.26s-13.38-22.71-13.38-23.24c0-0.53,12.23-24.71,14-24.47c1.27,0.18,1.14,9.77,1.14,9.77s27.55-0.53,30.28-0.7c2.73-0.18,5.37-1.23,6.78-3.34s4.58-7.13,2.2-12.32c-2.12-4.62-9.42-18.92-10.47-21.04C108.36,46.27,107.39,44.87,107.73,43.86z"/>
+		<path d="M58.33,113.54c-0.39,1.53-1.59,1.57-3,1.66c-1.41,0.09-20.42,0-24.56-0.44c-4.14-0.44-8.1-3.52-9.59-6.95c-1.5-3.43-7.57-14.17-11.79-23.06S4.2,73.31,3.93,71.28s2.02-7.13,4.31-10.83c2.29-3.7,3.87-5.99,3.87-5.99s-8.29-5.46-8.45-6.51c-0.11-0.7,8.35-0.95,15.58-1.23c7.12-0.28,14.35-0.44,14.88,0.09c0.53,0.53,4.31,8.36,6.51,12.85s6.69,12.76,6.6,13.55c-0.13,1.14-1.29,0.57-2.96-0.14c-1.67-0.7-7.86-3.91-7.86-3.91s-6.95,11.88-9.68,17.43c-2.73,5.55-5.37,10.91-4.67,15.84c0.43,2.98,4.05,8.27,10.74,8.98s21.56,0.26,23.33,0.35C57.89,111.86,58.69,112.15,58.33,113.54z"/>
+	</svg>
+</button>
+<button id='up' onPointerDown="game.input('up')" class='ctrl touch' aria-label='Up'>
+	<svg viewBox="0 0 128 128">
+		<path d="M64,92h29.2c1.48-0.02,2.67-1.23,2.65-2.71c-0.01-0.45-0.12-0.89-0.35-1.29L66.3,37.3c-0.7-1.27-2.31-1.73-3.58-1.02c-0.43,0.24-0.79,0.59-1.02,1.02L32.5,88c-0.73,1.29-0.28,2.92,1.01,3.65c0.39,0.22,0.84,0.34,1.29,0.35H64z"/>
+	</svg>
+</button>
+<button onPointerDown="game.input('down')" class='ctrl touch' aria-label='Down'>
+	<svg viewBox="0 0 128 128">
+		<path d="M64.2,39.7H34.8c-1.48,0.02-2.67,1.23-2.65,2.71c0.01,0.45,0.12,0.89,0.35,1.29l29.3,51c0.7,1.27,2.31,1.73,3.58,1.02c0.43-0.24,0.79-0.59,1.02-1.02l29.3-51c0.73-1.29,0.28-2.92-1.01-3.65c-0.39-0.22-0.84-0.34-1.29-0.35L64.2,39.7z"/>
+	</svg>
+</button>
+<button onPointerDown="game.input('drop')" class='ctrl touch' aria-label='Drop'>
+	<svg viewBox="0 0 128 128">
+		<path d="M67.76,61.95h22.3c1.13-0.13,2.15,0.69,2.28,1.82c0.05,0.45-0.05,0.9-0.28,1.28l-25.6,39.9c-0.76,1.1-2.28,1.38-3.38,0.62c-0.24-0.17-0.45-0.38-0.62-0.62l-25.7-39.9c-0.58-0.98-0.26-2.24,0.72-2.82c0.39-0.23,0.84-0.33,1.28-0.28h22.3l-24.4-37c-0.9-1.4,0.2-3,2-3h51.5c1.8,0,2.9,1.7,2,3L67.76,61.95z"/>
+	</svg>
+</button>
+</div></div></main>
+<script>
+const {ceil,floor,max,min,random,round} = Math
+const appid = 'dsblock'
+const eid = document.getElementById.bind(document)
+const ccw = i => (i+N-1) % N
+const cw = i => (i+1) % N
+const N = 4
+const NN = N * N
+const palette = {
+	bg:'#000000',
+	0:'#C3FEAF',
+	1:'rgb(26,255,128)',
+	2:'rgb(255,182,66)',
+	3:'rgb(46,207,255)',
+	4:'rgb(192,255,255)',
+	5:'rgb(255,46,46)',
+	6:'rgb(207,46,255)',
+	7:'rgb(128,128,255)',
+	8:'rgb(32,96,255)',
+	9:'rgb(224,224,64)',
+}
+const themes_length = 1 + max(...Object.keys(palette).map(x=>parseInt(x)||0))
+const themes = Array(themes_length)
+
+for(const pi in palette){
+	const k = `--pi_${pi}`
+	document.documentElement.style.setProperty(k, palette[pi])
+}
+class Block{
+	static ci = {I:1,J:2,L:3,O:4,S:5,T:6,Z:7}
+	static level = 0
+	static lines_per_level = 4000
+	static keymap = {
+		'ArrowDown': 'down',
+		'ArrowLeft': 'left',
+		'ArrowRight': 'right',
+		'ArrowUp': 'up',
+		'Backspace': 'pause',
+		'BracketLeft': 'delay_decrement',
+		'BracketRight': 'delay_increment',
+		'Comma': 'bpf_decrement',
+		'Delete': 'reverse',
+		'End': 'drop',
+		'Enter': 'drop',
+		'Equal': 'bpf_increment',
+		'Escape': 'pause',
+		'F2': 'reset',
+		'Home': 'hold',
+		'KeyA': 'left',
+		'KeyB': 'level_decrement',
+		'KeyC': 'rotate',
+		'KeyD': 'right',
+		'KeyE': 'rotate',
+		'KeyF': 'drop',
+		'KeyG': 'pause',
+		'KeyH': 'hold',
+		'KeyI': 'up',
+		'KeyJ': 'reverse',
+		'KeyK': 'rotate',
+		'KeyL': 'drop',
+		'KeyM': 'drop',
+		'KeyN': 'level_increment',
+		'KeyO': 'right',
+		'KeyP': 'pause',
+		'KeyQ': 'reverse',
+		'KeyR': 'hold',
+		'KeyS': 'down',
+		'KeyU': 'left',
+		'KeyV': 'hold',
+		'KeyW': 'up',
+		'KeyX': 'drop',
+		'KeyZ': 'reverse',
+		'Minus': 'bpf_decrement',
+		'NumpadAdd': 'bpf_increment',
+		'NumpadDivide': 'delay_decrement',
+		'NumpadMultiply': 'delay_increment',
+		'NumpadSubtract': 'bpf_decrement',
+		'PageDown': 'rotate',
+		'PageUp': 'reverse',
+		'Pause': 'pause',
+		'Period': 'bpf_increment',
+		'Semicolon': 'hold',
+		'ShiftLeft': 'hold',
+		'ShiftRight': 'hold',
+		'Space': 'drop',
+	}
+	static kick = {
+		'I01':[[0,0],[-2,0],[ 1, 0],[-2, 1],[ 1,-2]],
+		'I03':[[0,0],[-1,0],[ 2, 0],[-1,-2],[ 2, 1]],
+		'I10':[[0,0],[ 2,0],[-1, 0],[ 2,-1],[-1, 2]],
+		'I12':[[0,0],[-1,0],[ 2, 0],[-1,-2],[ 2, 1]],
+		'I21':[[0,0],[ 1,0],[-2, 0],[ 1, 2],[-2,-1]],
+		'I23':[[0,0],[ 2,0],[-1, 0],[ 2,-1],[-1, 2]],
+		'I30':[[0,0],[ 1,0],[-2, 0],[ 1, 2],[-2,-1]],
+		'I32':[[0,0],[-2,0],[ 1, 0],[-2, 1],[ 1,-2]],
+		'J01':[[0,0],[-1,0],[-1,-1],[ 0, 2],[-1, 2]],
+		'J03':[[0,0],[ 1,0],[ 1,-1],[ 0, 2],[ 1, 2]],
+		'J10':[[0,0],[ 1,0],[ 1, 1],[ 0,-2],[ 1,-2]],
+		'J12':[[0,0],[ 1,0],[ 1, 1],[ 0,-2],[ 1,-2]],
+		'J21':[[0,0],[-1,0],[-1,-1],[ 0, 2],[-1, 2]],
+		'J23':[[0,0],[ 1,0],[ 1,-1],[ 0, 2],[ 1, 2]],
+		'J30':[[0,0],[-1,0],[-1, 1],[ 0,-2],[-1,-2]],
+		'J32':[[0,0],[-1,0],[-1, 1],[ 0,-2],[-1,-2]],
+	}
+	static padb = {I:2,J:2,L:2,O:2,S:1,T:2,Z:1}
+	static padl = {I:0,J:0,L:0,O:1,S:0,T:0,Z:0}
+	static padr = {I:0,J:1,L:1,O:1,S:1,T:1,Z:1}
+	static padt = {I:1,J:1,L:1,O:1,S:0,T:1,Z:0}
+	static pb = {
+		I: [0b00011110000, 0b100010001000100, 0b111100000000, 0b10001000100010],
+		J: [0b00001110001, 0b000001000100110, 0b010001110000, 0b00001100100010],
+		L: [0b00001110100, 0b000011000100010, 0b000101110000, 0b00001000100011],
+		O: [0b11001100000, 0b000011001100000, 0b011001100000, 0b00011001100000],
+		S: [0b00000110110, 0b000010001100010, 0b001101100000, 0b00001000110001],
+		T: [0b00001110010, 0b000001001100010, 0b001001110000, 0b00001000110010],
+		Z: [0b00001100011, 0b000001001100100, 0b011000110000, 0b00000100110010],
+	}
+	static pieces = Object.keys(Block.pb)
+	static ppci = {1:0,2:2,3:1,4:0,5:2,6:0,7:1}
+	static ppco = {I:0,J:2,L:1,O:0,S:2,T:0,Z:1}
+	static pr = {I:0,J:2,L:2,O:0,S:0,T:2,Z:0}
+	static prev_z = 1/4
+	static score = {
+		1: 100,
+		2: 300,
+		3: 500,
+		4: 800,
+	}
+	static y_init = 0
+	static y_min = {
+		I: [-1, -4, -1, -4],
+		J: [-2, -3, -2, -3],
+		L: [-2, -3, -2, -3],
+		O: [-2, -2, -2, -2],
+		S: [-2, -3, -2, -3],
+		T: [-2, -3, -2, -3],
+		Z: [-2, -3, -2, -3],
+	}
+	constructor(options){
+		const o = Object.assign({
+			bpf: 1,
+			ghost_alpha: 0.25,
+			preview: 1,
+			sizer: null,
+			status: null,
+		}, options)
+		let { canvas, sizer, status } = o
+		if(!sizer){ throw new Error('sizer element required')	}
+		if(!status){ throw new Error('status element required')	}
+		this.sizer = sizer
+		this.status = status
+		this.storage = (typeof Storage) && (localStorage instanceof Storage) && localStorage
+		this.bpf = o.bpf
+		const create_canvas = !canvas
+		create_canvas && (canvas = document.createElement('canvas'))
+		this.canvas = canvas
+		canvas.style.position = 'absolute'
+		create_canvas && document.body.appendChild(canvas)
+		const c = this.c = canvas.getContext('2d')
+		this.keyhold = {}
+		this.keymap = Block.keymap
+		document.addEventListener('keydown', e => {
+			const action = this.keymap[e.code]
+			if(!action || (document.activeElement !== document.body)){
+				return
+			}
+			action && this.input(action, e.repeat)
+			if(this.keydown){ return }
+			this.keydown = true
+			document.querySelectorAll('.touch').forEach(
+				el => el.hidden = true
+			)
+		})
+		document.addEventListener('keyup', e => {
+			const action = this.keymap[e.code]
+			this.keyhold[action] = false
+		})
+		this.ghost_alpha = o.ghost_alpha
+		this.preview = o.preview
+		const resize_raf = requestAnimationFrame.bind(null, this.resize.bind(this))
+		window.addEventListener('resize', resize_raf)
+		this.reset(true)
+		const {g,gs,gw} = this
+	}
+	input(action, repeat=false){
+		const {bag,hold,piece,rot,x,y} = this
+		const pd = Block.pb[piece][rot]
+		const y_min = Block.y_min[piece][rot]
+		let bpf, delay, grav
+		switch(action){
+			case 'down':
+				this.down(1, !repeat)
+			break
+			case 'left':
+				this.can_move(x-1,y,pd,y_min) && (this.x -= 1)
+			break
+			case 'right':
+				this.can_move(x+1,y,pd,y_min) && (this.x += 1)
+			break
+			case 'up':
+				this.grav || this.can_move(x,y-1,pd,y_min) && (this.y -= 1)
+			break
+			case 'drop':
+				this.drop(x,y,pd,y_min)
+			break
+			case 'hold':
+				hold && bag.push(hold)
+				this.hold = piece
+				this.piece = void 0
+				this.store('bag',bag)
+				this.store('hold',this.hold)
+			break
+			case 'pause':
+				grav = !this.grav
+			break
+			case 'reset':
+				this.reset()
+			break
+			case 'reverse':
+				this.rotate(ccw(rot))
+			break
+			case 'rotate':
+				this.rotate(cw(rot))
+			break
+			case 'bpf_decrement':
+				bpf = this.bpf - 1
+			break
+			case 'bpf_increment':
+				bpf = this.bpf + 1
+			break
+			case 'delay_decrement':
+				delay = max(0, this.delay - 100)
+			break
+			case 'delay_increment':
+				delay = this.delay + 100
+			break
+			case 'level_decrement':
+				this.set_theme(this.level - 1)
+			break
+			case 'level_increment':
+				this.set_theme(this.level + 1)
+			break
+			default: return
+		}
+		this.gravitate(delay, grav, true, bpf)
+	}
+	can_move(x, y, pd, y_min=0){
+		const {field,gh,gw} = this
+		let region = 0
+		const skip = (y * gw) + x
+		for(let i=NN-1; i>=0; --i){
+			const xi = x + (i % N)
+			const yi = y + floor(i / N)
+			if(xi>=0 && yi>=0 && xi<gw && yi<gh){
+				region |= field[skip + gw * floor(i / N) + (i % N)] ? 1 : 0
+			}
+			else if(xi<0 || xi>=gw || yi<y_min || yi>=gh){
+				region |= 1
+			}
+			i && (region <<= 1)
+		}
+		return !(pd & region)
+	}
+	dc(x, y, ti, opacity=1, z=1){
+		const {c,g,gg,ghs,gp,theme_index} = this
+		y += ghs + .1
+		c.save()
+		c.globalAlpha = opacity
+		c.fillStyle = palette[theme_index]
+		c.fillRect(g*(x+1/7)*z, g*(y+.1)*z, g*z*2/7, g*z*.8)
+		c.fillRect(g*(x+4/7)*z, g*(y+.1)*z, g*z*2/7, g*z*.8)
+		c.restore()
+	}
+	dp(piece, rot, x, y, opacity, z){
+		let pd = Block.pb[piece][rot]
+		let dx = 0
+		while(pd){
+			;(pd & 1) && this.dc(x + dx, y, Block.ppco[piece], opacity, z)
+			dx = (dx+1) % N
+			dx || (y += 1)
+			pd >>= 1
+		}
+	}
+	down(bpf, can_drop=true){
+		const {piece,rot,x,y} = this
+		const pd = Block.pb[piece]?.[rot]
+		if(!pd){ return }
+		const y_min = Block.y_min[piece][rot]
+		let can_move
+		do{
+			can_move = this.can_move(x, y+1, pd, y_min)
+			bpf && can_move && (this.y += 1)
+		} while(--bpf > 0)
+		can_drop && !can_move && this.drop(x,y,pd,y_min)
+	}
+	drop(x, y, pd, y_min){
+		if(!pd){ return }
+		while(this.can_move(x,y+1,pd,y_min)){
+			y += 1
+		}
+		const {field,gs,gw} = this
+		const ci = Block.ci[this.piece]
+		let dx = 0, i, yi = y
+		while(pd){
+			i = yi*gw + x + dx
+			;((i >= 0) && (pd & 1)) && (field[i] = ci)
+			dx = (dx+1) % N
+			dx || (yi += 1)
+			pd >>= 1
+		}
+		if(yi < 0){ return }
+		this.piece = void 0
+		i = gs
+		let count = 0
+		let lines = 0
+		while(--i >= 0){
+			field[i] && (count += 1)
+			if(count === gw){
+				for(let j = 0; j < gw; ++j){
+					field[i + j] = 0
+				}
+				const beginning = field.slice(0, i)
+				field.set(beginning, gw)
+				field.set(new Uint8Array(gw))
+				i += gw
+				lines += 1
+			}
+			if(!(i % gw)){ count = 0 }
+		}
+		const level_delta = floor((this.lines + lines) / Block.lines_per_level) - floor(this.lines / Block.lines_per_level)
+		level_delta && this.set_theme(this.level + level_delta)
+		this.lines += lines
+		this.score += (Block.score[lines] ?? (100 * lines)) + (2 * (y - max(0, this.y)))
+		this.store('field',field.toBase64())
+		this.store('lines',this.lines)
+		this.store('score',this.score)
+	}
+	frame(){
+		const pz = Block.prev_z
+		const {c,field,g,gg,gh,ghost_alpha,ghs,gs,gw,h,hold,preview,theme_index,w} = this
+		let {bag,piece,rot,x,y} = this
+		const bag_length = bag.length
+		c.clearRect(0, 0, w, h)
+		c.fillStyle = palette[theme_index]
+		for(let i=gs-1; i>=0; --i){
+			field[i] && this.dc(i % gw, floor(i / gw), Block.ppci[field[i]])
+			field[i] || c.fillRect((i%gw+4/10)*g, floor(i/gw+ghs+.9)*g, gg, gg)
+		}
+		if(bag_length <= max(1, preview)){
+			bag.unshift(...shuffle(Block.pieces.slice(0)))
+		}
+		if(!piece){
+			piece = this.piece = bag.pop()
+			rot = this.rot = Block.pr[piece]
+			x = this.x = 3
+			y = this.y = Block.y_init - Block.padt[piece]
+		}
+		const pd = Block.pb[piece][rot]
+		const y_min = Block.y_min[piece][rot]
+		if(!this.can_move(x,y,pd,y_min)){
+			if(y > -3){
+				this.y -= 1
+				return this.frame()
+			}
+			return this.grav && this.gravitate(void 0, false, true)
+		}
+		this.dp(piece,rot,x,y)
+		let y_ghost = y
+		while(this.can_move(x,y_ghost+1,pd,y_min)){
+			y_ghost += 1
+		}
+		if(y !== y_ghost){
+			this.dp(piece,rot,x,y_ghost,ghost_alpha)
+		}
+		y = Block.y_init - .5
+		hold && this.dp(hold,Block.pr[hold],1,y-Block.padb[hold],1,pz)
+		x = round(gw / pz) - 1
+		bag.slice(-preview).forEach((piece, i) => {
+			const padb = Block.padb[piece]
+			const padl = Block.padl[piece]
+			const padr = Block.padr[piece]
+			x += Block.padr[piece] - N
+			this.dp(piece,Block.pr[piece],x,y-padb,void 0,pz)
+			x += padl - 1
+		})
+		x = round(gw / pz - N)
+		this.status.innerHTML = `${
+			(this.score+'')}\n${
+			(this.lines+'')
+		}`
+		;(bag_length !== bag.length) && this.store('bag',bag.concat(piece))
+	}
+	gravitate(delay, grav, clear, bpf){
+		if(grav === void 0){ grav = this.grav }
+		else{
+			this.grav = grav
+			eid('grav') && (eid('grav').checked = grav)
+			eid('up') && (eid('up').style.visibility = grav ? 'hidden' : 'visible')
+		}
+		if(bpf !== void 0){
+			bpf = min(20, max(0, bpf))
+			this.bpf = bpf
+			eid('bpf').value = bpf
+		}
+		delay = delay ?? this.delay
+		if(this.delay !== delay){
+			this.delay = delay
+			eid('delay').value = (delay / 1000).toFixed(1)
+			this.gravity_loop = this.gravitate.bind(this, delay)
+		}
+		if(clear || !grav || !delay || (this.delay !== delay)){
+			window.clearTimeout(this.timeout)
+		}
+		if(!grav || !delay){
+			this.frame()
+			return
+		}
+		if(!clear){
+			this.down(this.bpf)
+		}
+		this.timeout = window.setTimeout(this.gravity_loop, delay)
+		this.frame()
+	}
+	reset(revive=false){
+		this.bag = revive && this.store_get('bag')?.split(',') || []
+		this.hold = revive && this.store_get('hold') || void 0
+		this.lines = revive && parseInt(this.store_get('lines')) || 0
+		this.piece = void 0
+		this.score = revive && parseInt(this.store_get('score')) || 0
+		this.set_theme(Block.level + this.lines / Block.lines_per_level)
+		const delay = this.delay ?? 1000
+		const gh = this.gh = 20
+		const ghs = this.ghs = 3
+		this.ght = gh + ghs
+		const gw = this.gw = 10
+		this.resize()
+		const gs = this.gs = gh * gw
+		this.field = new Uint8Array(gs)
+		if(revive){
+			const field = this.store_get('field')
+			field && this.field.setFromBase64(field)
+		}
+		this.gravitate(delay, void 0, true, this.bpf)
+		this.frame()
+	}
+	resize(){
+		const {c, canvas, ght, gw, sizer} = this
+		const rect = sizer.getBoundingClientRect()
+		let h = rect.height
+		let w = rect.width
+		let g = min(h/ght, w/gw)
+		const gph = this.gph = 10
+		const gpw = this.gpw = 5
+		const gg = this.gg = g/gph
+		this.g = g
+		h = this.h = g * ght
+		w = this.w = g * gw
+		const x = floor(rect.x)
+		const y = floor(rect.y)
+		const scale = window.devicePixelRatio
+		canvas.height = h * scale
+		canvas.width = w * scale
+		canvas.style.height = `${h}px`
+		canvas.style.left = `${x}px`
+		canvas.style.top = `${y}px`
+		canvas.style.width = `${w}px`
+		c.lineWidth = gg
+		c.scale(scale, scale)
+		this.field && this.frame()
+	}
+	rotate(rotb){
+		const {piece,rot,x,y} = this
+		if('O' === piece){ return }
+		const kick = Block.kick[('I'===piece?'I':'J') + rot + rotb]
+		const pd = Block.pb[piece][rotb]
+		const y_min = Block.y_min[piece][rotb]
+		let success, i = 0
+		do{
+			success = this.can_move(x + kick[i][0], y + kick[i][1], pd, y_min)
+			if(success){ break }
+		} while(++i !== kick.length)
+		if(success){
+			this.rot = rotb
+			this.x += kick[i][0]
+			this.y += kick[i][1]
+		}
+	}
+	set_level(t){
+		t = parseInt(t)
+		if(isNaN(t)) return
+		this.set_theme(t)
+		this.frame()
+	}
+	set_theme(t){
+		t ??= this.level ?? Block.level
+		const len = themes.length
+		t = floor((t + len) % len)
+		this.theme_index = t
+		eid('theme').value = this.level = t
+		document.documentElement.style.setProperty(`--pi_ui`, palette[t])
+	}
+	store_get(k){
+		return this.storage?.getItem(appid+k)
+	}
+	store(k,v){
+		this.storage?.setItem(appid+k,v)
+	}
+}
+function shuffle(a){
+	for(let i = a.length - 1; i > 0; --i){
+		const j = floor((i+1) * random())
+		const ai = a[i]
+		a[i] = a[j]
+		a[j] = ai
+	}
+	return a
+}
+const game = new Block({
+	sizer:eid('wall'),
+	status:eid('status'),
+})
+</script>
