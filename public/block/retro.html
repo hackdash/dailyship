@@ -513,14 +513,15 @@ class Block{
 	}
 	dc(x, y, ti, opacity=1, z=1){
 		const {c,g,g16,g8,ghs,theme} = this
-		const pi = theme[ti], pi_0 = theme[0], pi_2 = theme[2]
-		const z2 = (pi_0 == pi_2), m0 = (pi_0 == pi)
+		const pi = theme[ti], pi_0 = theme[0], pi_1 = theme[1], pi_2 = theme[2]
+		const z1 = (pi_0 == pi_1), z2 = (pi_0 == pi_2), m0 = (pi_0 == pi),
+			ti0 = ti === 0, ti1 = ti === 1, ti2 = ti === 2
 		let xi, yi
 		y += ghs
 		c.save()
 		c.globalAlpha = opacity
 		c.lineWidth = g8 * z
-		if(!ti && !z2){
+		if(ti0 && !z2){
 			c.strokeStyle = palette[pi_2]
 			c.beginPath()
 			c.moveTo((xi=x*g+g8)*z, (yi=y*g+g16)*z)
@@ -531,8 +532,10 @@ class Block{
 			c.stroke()
 		}
 		c.fillStyle = palette[pi]
-		!ti && !z2 && c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
-		if(ti && !m0){
+		if(ti0 && !z2){
+			c.fillRect((1 + x*8)*g8*z, (1 + y*8)*g8*z, 5*g8*z, 5*g8*z)
+		}
+		if(!ti0 && !m0){
 			c.beginPath()
 			c.moveTo((xi=x*g+g8)*z, (yi=y*g)*z)
 			c.lineTo((xi+=6*g8)*z, yi*z)
@@ -542,7 +545,7 @@ class Block{
 			c.lineTo((xi+=g8)*z, yi*z)
 			c.fill()
 		}
-		if(ti && (pi_0 !== pi)){
+		if(!ti0 && !m0){
 			c.strokeStyle = palette[pi_0]
 			c.beginPath()
 			c.moveTo((xi=x*g+g8+g16)*z, (yi=y*g+3*g8)*z)
@@ -550,11 +553,11 @@ class Block{
 			c.lineTo((xi+g8+g16)*z, yi*z)
 			c.stroke()
 		}
-		if(!z2 || !m0){
+		if((!ti1 && !z2) || (ti1 && !z1)){
 			c.fillStyle = palette[pi_0]
 			c.fillRect(x*g*z, y*g*z, g8*z, g8*z)
 		}
-		if(z2 && m0){
+		if((!ti1 && z2) || (ti1 && z1)){
 			c.fillRect(x*g*z, y*g*z, 7*g8*z, 7*g8*z)
 		}
 		c.restore()
