@@ -73,6 +73,7 @@ global.lgal = global.l_per_gal = 3.785411784
 global.li = global.link = 0.201168
 global.ln = Math.log
 global.log = console.log
+global.logb = (b, x) => ln(x) / ln(b)
 global.m = global.meter = 1
 global.maxint = Number.MAX_SAFE_INTEGER
 global.maxval = Number.MAX_VALUE
@@ -121,7 +122,6 @@ global.hand = 4 * inch
 global.incm = global.cm_per_in = inch / cm
 global.inmm = global.mm_per_in = inch / mm
 global.kglb = global.lb_per_kg = 1 / lb
-global.logb = (x) => ln(x) / ln(b)
 global.mft = global.ft_per_m = 1 / ft
 global.mlfloz = 1 / flozml
 global.oz = global.kg_per_oz = lb / 16
