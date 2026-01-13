@@ -1038,7 +1038,7 @@ SOFTWARE.
 
                     this.closeModal();
 
-                    if (!keep && chosen !== this.gridSize) {
+                    if (chosen !== this.gridSize) {
                         this.setGridSize(chosen, true);
                         // setGridSize already resets history and renders
                         return;
