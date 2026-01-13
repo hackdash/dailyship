@@ -157,6 +157,7 @@ SOFTWARE.
         .control-label {
             display: flex;
             gap: 0.25em;
+            white-space: nowrap;
         }
 
         .custom-select {
@@ -178,7 +179,6 @@ SOFTWARE.
             line-height: 2;
             padding: 0 0.5em;
         }
-
         .tool-button,
         .high {
             line-height: 2;
@@ -353,18 +353,18 @@ SOFTWARE.
                     </label>
 
                     <div class="row">
-                        <label class="tool-button">
-                            <input id="toggleGrid" checked type="checkbox" />
+                        <label class="control-label high">
                             Grid
+                            <input id="toggleGrid" checked type="checkbox" />
                         </label>
                         <label class="control-label grow">
-                            <span class="high">Opacity</span>
                             <input
                                 class="grow"
                                 class="range"
                                 id="gridOpacity"
                                 max="100"
                                 min="0"
+                                style="width:0"
                                 type="range"
                                 value="35"
                             />
