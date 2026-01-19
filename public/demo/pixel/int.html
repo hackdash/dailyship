@@ -376,13 +376,13 @@
           </button>
         </div>
         <!-- <div class="btn-row"> -->
-          <!-- <div class="control-group__title high">Flip</div> -->
-          <!-- <button id="flipHBtn" class="tool-button" type="button"> -->
-            <!-- <u>H</u>orizontal -->
-          <!-- </button> -->
-          <!-- <button id="flipVBtn" class="tool-button" type="button"> -->
-            <!-- <u>V</u>ertical -->
-          <!-- </button> -->
+        <!-- <div class="control-group__title high">Flip</div> -->
+        <!-- <button id="flipHBtn" class="tool-button" type="button"> -->
+        <!-- <u>H</u>orizontal -->
+        <!-- </button> -->
+        <!-- <button id="flipVBtn" class="tool-button" type="button"> -->
+        <!-- <u>V</u>ertical -->
+        <!-- </button> -->
         <!-- </div> -->
       </div>
       <div class="control-group" aria-label="Export">
@@ -492,8 +492,22 @@
     const eid = document.getElementById.bind(document);
     const h = document.createElement.bind(document);
 
+    const cast = (c) => (c < 0) ? (c + 0x100000000) : c;
+
     // Transform char code to its hexadecimal value
     const hd = (c) => (c & 0xf) + 9 * (c >> 6);
+
+    function colorInt(s) {
+      const r = hd(s.charCodeAt(1)) << 4 | hd(s.charCodeAt(2))
+      const g = hd(s.charCodeAt(3)) << 4 | hd(s.charCodeAt(4))
+      const b = hd(s.charCodeAt(5)) << 4 | hd(s.charCodeAt(6))
+      const a = hd(s.charCodeAt(7)) << 4 | hd(s.charCodeAt(8))
+      return (r << 24) | (g << 16) | (b << 8) | (a << 0)
+    }
+
+    function colorStr(c) {
+      return `#${(cast(c)).toString(16).padStart(8, '0')}`
+    }
 
     class PixelArtStudio {
       constructor() {
@@ -553,7 +567,7 @@
 
       init() {
         this.ui.gridSize.value = this.gridSize;
-        this.setColor(0xffffffff);
+        this.setColor(0x80000000);
         this.loadSavedSlots();
         this.allocatePixelBuffer();
         this.adjustCanvasSize();
@@ -561,18 +575,6 @@
         this.renderPalette();
         this.updateStatus();
         this.render();
-      }
-
-      colorInt(s) {
-        const r = hd(s.charCodeAt(1)) << 4 | hd(s.charCodeAt(2))
-        const g = hd(s.charCodeAt(3)) << 4 | hd(s.charCodeAt(4))
-        const b = hd(s.charCodeAt(5)) << 4 | hd(s.charCodeAt(6))
-        const a = hd(s.charCodeAt(7)) << 4 | hd(s.charCodeAt(8))
-        return (r << 24) | (g << 16) | (b << 8) | (a << 0)
-      }
-
-      colorStr(c) {
-        return `#${c.toString(16).padStart(8, '0')}`
       }
 
       idx(x, y) {
@@ -588,8 +590,8 @@
       }
 
       setPixel(i, color) {
-        console.log('setPixel', i, color)
         this.pixels[i] = color;
+        console.table({i, color, 'this.pixels[i]':this.pixels[i]})
       }
 
       allocatePixelBuffer() {
@@ -614,34 +616,36 @@
       };
 
       bindEvents() {
-        this.ui.colorPicker.addEventListener("input", (e) => {
+        const { ui } = this
+        const { brushSize } = ui
+        ui.colorPicker.addEventListener("input", (e) => {
           this.setColor(e.target.value, true);
         });
 
-        this.ui.brushSize.addEventListener("blur", (e) => this.setBrush(e.target.value));
-        this.ui.brushSize.addEventListener("change", (e) => this.setBrush(e.target.value));
-        this.ui.brushSize.addEventListener("focus", (e) => this.ui.brushSize.select());
+        brushSize.addEventListener("blur", (e) => this.setBrush(e.target.value));
+        brushSize.addEventListener("change", (e) => this.setBrush(e.target.value));
+        brushSize.addEventListener("focus", (e) => brushSize.select());
 
-        this.ui.drawTool.addEventListener("click", () =>
+        ui.drawTool.addEventListener("click", () =>
           this.setTool("draw"),
         );
-        this.ui.fillTool.addEventListener("click", () =>
+        ui.fillTool.addEventListener("click", () =>
           this.setTool("fill"),
         );
-        this.ui.eraseTool.addEventListener("click", () =>
+        ui.eraseTool.addEventListener("click", () =>
           this.setTool("erase"),
         );
-        this.ui.pickTool.addEventListener("click", () =>
+        ui.pickTool.addEventListener("click", () =>
           this.setTool("pick"),
         );
 
-        this.ui.toggleGrid.addEventListener("change", (e) => {
+        ui.toggleGrid.addEventListener("change", (e) => {
           this.showGrid = e.target.checked;
           this.updateStatus();
           this.render();
         });
 
-        this.ui.gridOpacity.addEventListener("input", (e) => {
+        ui.gridOpacity.addEventListener("input", (e) => {
           this.gridOpacity = Math.max(
             0,
             Math.min(1, parseInt(e.target.value, 10) / 100),
@@ -649,42 +653,42 @@
           this.render();
         });
 
-        this.ui.undoBtn.addEventListener("click", () =>
+        ui.undoBtn.addEventListener("click", () =>
           this.undo(),
         );
-        this.ui.redoBtn.addEventListener("click", () =>
+        ui.redoBtn.addEventListener("click", () =>
           this.redo(),
         );
 
-        this.ui.clearBtn.addEventListener("click", () => {
+        ui.clearBtn.addEventListener("click", () => {
           this.pushHistory("clear");
           this.clearPixels();
           this.render();
         });
 
-        // this.ui.flipHBtn.addEventListener("click", () =>
+        // ui.flipHBtn.addEventListener("click", () =>
         //   this.flipHorizontal(),
         // );
-        // this.ui.flipVBtn.addEventListener("click", () =>
+        // ui.flipVBtn.addEventListener("click", () =>
         //   this.flipVertical(),
         // );
 
-        this.ui.exportPNG.addEventListener("click", () =>
+        ui.exportPNG.addEventListener("click", () =>
           this.exportPNG(),
         );
 
         // Modal events
-        this.ui.newProjectBtn.addEventListener("click", () =>
+        ui.newProjectBtn.addEventListener("click", () =>
           this.openModal(),
         );
-        this.ui.modalCancel.addEventListener("click", () =>
+        ui.modalCancel.addEventListener("click", () =>
           this.closeModal(),
         );
-        this.ui.modalOverlay.addEventListener("click", (e) => {
-          if (e.target === this.ui.modalOverlay)
+        ui.modalOverlay.addEventListener("click", (e) => {
+          if (e.target === ui.modalOverlay)
             this.closeModal();
         });
-        this.ui.modalConfirm.addEventListener("click", () =>
+        ui.modalConfirm.addEventListener("click", () =>
           this.confirmNewProject(),
         );
 
@@ -797,21 +801,22 @@
       }
 
       setTool(tool) {
+        const { ui } = this
         this.tool = tool;
 
-        this.ui.drawTool.classList.toggle(
+        ui.drawTool.classList.toggle(
           "active",
           tool === "draw",
         );
-        this.ui.eraseTool.classList.toggle(
+        ui.eraseTool.classList.toggle(
           "active",
           tool === "erase",
         );
-        this.ui.fillTool.classList.toggle(
+        ui.fillTool.classList.toggle(
           "active",
           tool === "fill",
         );
-        this.ui.pickTool.classList.toggle(
+        ui.pickTool.classList.toggle(
           "active",
           tool === "pick",
         );
@@ -823,11 +828,11 @@
       setColor(colorAny, fromPicker = false) {
         let color;
         switch (typeof colorAny) {
-          case 'number': color = colorAny; break;
-          case 'string': color = this.colorInt(colorAny); break;
+          case 'number': color = cast(colorAny); break;
+          case 'string': color = colorInt(colorAny); break;
         }
         this.currentColor = color;
-        this.currentColorStr = this.colorStr(color);
+        this.currentColorStr = colorStr(color);
         this.ui.colorPicker.value = this.currentColorStr;
 
         if (fromPicker) this.addRecentColor(color);
@@ -874,9 +879,10 @@
       }
 
       renderPalette() {
-        this.ui.recentSwatches.innerHTML = "";
+        const { ui } = this
+        ui.recentSwatches.innerHTML = "";
         for (const c of this.recentColors) {
-          this.ui.recentSwatches.appendChild(
+          ui.recentSwatches.appendChild(
             this.makeSwatch(c, {
               selected:
                 c === this.currentColor,
@@ -886,7 +892,7 @@
           );
         }
 
-        this.ui.savedSwatches.innerHTML = "";
+        ui.savedSwatches.innerHTML = "";
         for (let i = 0, len = this.savedSlots.length; i < len; ++i) {
           const c = this.savedSlots[i];
           const el = this.makeSwatch(c, {
@@ -908,7 +914,7 @@
               if (c) this.setColor(c, false);
             },
           });
-          this.ui.savedSwatches.appendChild(el);
+          ui.savedSwatches.appendChild(el);
         }
       }
 
@@ -927,13 +933,10 @@
       }
 
       openModal() {
-        // Sync modal controls with current state
-        this.ui.modalGridSize.value = String(this.gridSize);
-
-        this.ui.modalOverlay.showModal();
-
-        // Focus something sensible so keyboard users aren’t abandoned
-        this.ui.modalConfirm.focus();
+        const { ui } = this
+        ui.modalGridSize.value = String(this.gridSize);
+        ui.modalOverlay.showModal();
+        ui.modalConfirm.focus();
       }
 
       closeModal() {
@@ -1031,7 +1034,7 @@
         }
 
         const key = `${cell},${this.tool},${this.brushSize}`;
-        if (this.lastPaintedKey === key){
+        if (this.lastPaintedKey === key) {
           return;
         }
         this.lastPaintedKey = key;
@@ -1073,7 +1076,10 @@
         return i;
       }
 
-      applyToolAt(x0, y0) {
+      applyToolAt(i) {
+        const x0 = this.getX(i)
+        const y0 = this.getY(i)
+        const { brushSize, gridSize } = this
         const half = Math.floor(this.brushSize / 2);
         const paintValue =
           this.tool === "erase"
@@ -1081,20 +1087,20 @@
             : this.currentColor;
 
         for (
-          let y = y0 - half, endY = y0 - half + this.brushSize;
+          let y = y0 - half, endY = y0 - half + brushSize;
           y < endY;
           ++y
         ) {
           for (
-            let x = x0 - half, endX = x0 - half + this.brushSize;
+            let x = x0 - half, endX = x0 - half + brushSize;
             x < endX;
             ++x
           ) {
             if (
               x < 0 ||
               y < 0 ||
-              x >= this.gridSize ||
-              y >= this.gridSize
+              x >= gridSize ||
+              y >= gridSize
             ) continue;
             this.setPixel(this.idx(x, y), paintValue);
           }
@@ -1207,13 +1213,14 @@
       }
 
       updateHistoryButtons() {
-        this.ui.undoBtn.disabled = this.undoStack.length < 2;
-        this.ui.redoBtn.disabled = this.redoStack.length === 0;
+        const { ui } = this
+        ui.undoBtn.disabled = this.undoStack.length < 2;
+        ui.redoBtn.disabled = this.redoStack.length === 0;
 
-        this.ui.undoBtn.style.filter = this.ui.undoBtn.disabled
+        ui.undoBtn.style.filter = ui.undoBtn.disabled
           ? "grayscale(0.4) opacity(0.75)"
           : "none";
-        this.ui.redoBtn.style.filter = this.ui.redoBtn.disabled
+        ui.redoBtn.style.filter = ui.redoBtn.disabled
           ? "grayscale(0.4) opacity(0.75)"
           : "none";
       }
@@ -1249,9 +1256,9 @@
         const pal = {};
         for (let i = 0, len = this.pixels.length; i < len; ++i) {
           const c = this.pixels[i];
-          if (!c) continue;
-          this.ctx.fillStyle = pal[c] ||= this.colorStr(c)
-          this.ctx.fillRect(this.getX(i) * s, this.getY(i) * s, s, s);
+          // if (!c) continue;
+          this.ctx.fillStyle = pal[c] ||= colorStr(c)
+          this.ctx.fillRect(s * this.getX(i), s * this.getY(i), s, s);
         }
 
         this.drawHoverPreview();
@@ -1284,8 +1291,8 @@
           this.ctx.strokeStyle = "rgba(0,0,0,0.25)";
           const s = this.pixelSize;
           this.ctx.strokeRect(
-            x * s + 1,
-            y * s + 1,
+            s * x + 1,
+            s * y + 1,
             s - 2,
             s - 2,
           );
@@ -1313,7 +1320,7 @@
               x1 >= this.gridSize ||
               y1 >= this.gridSize
             ) continue;
-            this.ctx.fillRect(x1 * s, y1 * s, s, s);
+            this.ctx.fillRect(s * x1, s * y1, s, s);
           }
         }
 
@@ -1354,12 +1361,13 @@
       }
 
       exportPNG() {
-        const s = parseInt(this.ui.exportScale.value, 10);
-        const transparent = this.ui.exportTransparent.checked;
+        const { gridSize, pixels, ui } = this
+        const s = parseInt(ui.exportScale.value, 10);
+        const transparent = ui.exportTransparent.checked;
 
         const out = h("canvas");
-        out.width = this.gridSize * s;
-        out.height = this.gridSize * s;
+        out.width = gridSize * s;
+        out.height = gridSize * s;
 
         const octx = out.getContext("2d");
         octx.imageSmoothingEnabled = false;
@@ -1369,15 +1377,15 @@
           octx.fillRect(0, 0, out.width, out.height);
         }
 
-        for (let i = 0, len = this.pixels.length; i < len; ++i) {
+        for (let i = 0, len = pixels.length; i < len; ++i) {
           const c = this.getPixel(i);
           if (!c) continue;
-          octx.fillStyle = this.colorStr(c);
+          octx.fillStyle = colorStr(c);
           octx.fillRect(getX(i) * s, getY(i) * s, s, s);
         }
 
         const link = h("a");
-        link.download = `pixel-art-${this.gridSize}x${this.gridSize}@${s}x${transparent ? "-transparent" : ""}.png`;
+        link.download = `pixel-art-${gridSize}x${gridSize}@${s}x${transparent ? "-transparent" : ""}.png`;
         link.href = out.toDataURL("image/png");
         link.click();
       }
@@ -1385,7 +1393,7 @@
 
     let p = new PixelArtStudio();
   </script>
-<!--
+  <!--
 MIT License
 
 Copyright (c) 2026 DailyShip.org
