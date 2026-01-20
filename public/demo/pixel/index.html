@@ -328,7 +328,7 @@
       <div class="control-group" aria-label="Canvas settings">
         <div class="control-group__title row">
           <span class="high">Canvas</span>
-          <button id="newProjectBtn" class="tool-button danger-soft grow" type="button">
+          <button id="newProjectBtn" class="tool-button danger-soft grow">
             <u>N</u>ew
           </button>
         </div>
@@ -344,8 +344,7 @@
             <input id="toggleGrid" checked type="checkbox" />
           </label>
           <label class="control-label grow">
-            <input class="grow" class="range" id="gridOpacity" max="255" min="0" style="width:0" type="range"
-              value="32" />
+            <input class="grow" id="gridOpacity" value="32" max="255" min="0" style="width:0" type="range" autocomplete="off" />
           </label>
         </div>
       </div>
@@ -357,43 +356,43 @@
             type="number">
         </label>
         <div class="btn-row spacer">
-          <button id="drawTool" class="tool-button active" type="button">
+          <button id="drawTool" class="tool-button active">
             <u>D</u>raw
           </button>
-          <button id="eraseTool" class="tool-button" type="button">
+          <button id="eraseTool" class="tool-button">
             <u>E</u>rase
           </button>
-          <button id="fillTool" class="tool-button" type="button">
+          <button id="fillTool" class="tool-button">
             <u>F</u>ill
           </button>
-          <button id="pickTool" class="tool-button" type="button">
+          <button id="pickTool" class="tool-button">
             P<u>i</u>ck
           </button>
         </div>
         <div class="btn-row">
-          <button id="undoBtn" class="tool-button" type="button" title="Cmd+Z">
+          <button id="undoBtn" class="tool-button" title="Cmd+Z">
             Undo
           </button>
-          <button id="redoBtn" class="tool-button" type="button" title="Cmd+Shift+Z or Cmd+Y">
+          <button id="redoBtn" class="tool-button" title="Cmd+Shift+Z or Cmd+Y">
             Redo
           </button>
-          <button id="clearBtn" class="tool-button danger" type="button">
+          <button id="clearBtn" class="tool-button danger">
             Clear
           </button>
         </div>
         <!-- <div class="btn-row"> -->
         <!-- <div class="control-group__title high">Flip</div> -->
-        <!-- <button id="flipHBtn" class="tool-button" type="button"> -->
+        <!-- <button id="flipHBtn" class="tool-button"> -->
         <!-- <u>H</u>orizontal -->
         <!-- </button> -->
-        <!-- <button id="flipVBtn" class="tool-button" type="button"> -->
+        <!-- <button id="flipVBtn" class="tool-button"> -->
         <!-- <u>V</u>ertical -->
         <!-- </button> -->
         <!-- </div> -->
       </div>
       <div class="control-group" aria-label="Export">
         <div class="control-group__title">
-          <button id="exportPNG" class="tool-button wide danger" type="button" title="Cmd+S">
+          <button id="exportPNG" class="tool-button wide danger" title="Cmd+S">
             Export PNG
           </button>
         </div>
@@ -406,6 +405,10 @@
         <label class="control-group__title control-label">
           <span class="high">Color</span>
           <input autocomplete="off" class="color-input wide" id="colorPicker" type="color" value="#000000" />
+        </label>
+        <label class="control-group__title control-label">
+          <span class="high">Opacity</span>
+          <input class="grow" id="opacity" value="255" max="255" min="0" style="width:0" type="range" autocomplete="off" />
         </label>
         <div id="recentSwatches" class="swatches" aria-label="Recent colors"></div>
         <div class="control-label high">Saved</div>
@@ -453,10 +456,10 @@
         </label>
       </div>
       <div class="modal__actions">
-        <button id="modalCancel" class="tool-button" type="button">
+        <button id="modalCancel" class="tool-button">
           Cancel
         </button>
-        <button id="modalConfirm" class="tool-button danger" type="button">
+        <button id="modalConfirm" class="tool-button danger">
           Start New
         </button>
       </div>
@@ -497,6 +500,7 @@
         this.lastPaintedKey = void 0;
         this.maxHistory = 60;
         this.maxRecent = 8;
+        this.opacity = 255;
         this.pal = {};
         this.pixels = void 0;
         this.pixelSize = 20;
@@ -525,6 +529,7 @@
           "modalGridSize",
           "modalOverlay",
           "newProjectBtn",
+          "opacity",
           "pickTool",
           "recentSwatches",
           "redoBtn",
@@ -541,7 +546,7 @@
 
       init() {
         this.ui.gridSize.value = this.gridSize;
-        this.setColor(0x800000FF);
+        this.setColor(0xFFFFFFFF);
         this.loadSavedSlots();
         this.allocatePixelBuffer();
         this.adjustCanvasSize();
@@ -592,7 +597,7 @@
         const { ui } = this
         const { brushSize } = ui
         ui.colorPicker.addEventListener("change", (e) => {
-          this.setColor(e.target.value + 'ff', true);
+          this.setColor(e.target.value + this.opacity, true);
         });
 
         brushSize.addEventListener("blur", (e) => this.setBrush(e.target.value));
@@ -621,6 +626,12 @@
         ui.gridOpacity.addEventListener("input", (e) => {
           this.gridOpacity = parseInt(e.target.value);
           this.render();
+        });
+        ui.opacity.addEventListener("input", (e) => {
+          this.opacity = parseInt(e.target.value);
+          this.setColor(
+            (this.currentColor & 0xFFFFFF00) + this.opacity
+          );
         });
 
         ui.undoBtn.addEventListener("click", () =>
@@ -890,7 +901,6 @@
 
       makeSwatch(color, { selected, onClick, title }) {
         const btn = h("button");
-        btn.type = "button";
         btn.className =
           "swatch" +
           (selected ? " swatch--selected" : "") +
@@ -1078,7 +1088,7 @@
       }
 
       pickColorAt(i) {
-        const c = this.getPixel(i);
+        const c = this.pixels[i];
         if (!c) return; // transparent pick unhelpful
         this.setColor(c, false);
         // Draw mode after pick color
