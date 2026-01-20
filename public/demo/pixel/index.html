@@ -221,6 +221,11 @@
     background: var(--danger-soft-hover);
   }
 
+  .tool-button:disabled {
+    background: 0;
+    cursor: default;
+  }
+
   .swatch,
   .swatches {
     display: grid;
@@ -344,7 +349,8 @@
             <input id="toggleGrid" checked type="checkbox" />
           </label>
           <label class="control-label grow">
-            <input class="grow" id="gridOpacity" value="32" max="255" min="0" style="width:0" type="range" autocomplete="off" />
+            <input class="grow" id="gridOpacity" type="range" value="32" max="255" min="0" autocomplete="off"
+              style="width:0" />
           </label>
         </div>
       </div>
@@ -408,7 +414,8 @@
         </label>
         <label class="control-group__title control-label">
           <span class="high">Opacity</span>
-          <input class="grow" id="opacity" value="255" max="255" min="0" style="width:0" type="range" autocomplete="off" />
+          <input class="grow" id="opacity" type="range" value="255" max="255" min="0" autocomplete="off"
+            style="width:0" />
         </label>
         <div id="recentSwatches" class="swatches" aria-label="Recent colors"></div>
         <div class="control-label high">Saved</div>
@@ -470,7 +477,13 @@
     const h = document.createElement.bind(document);
 
     const cast = (c) => (c < 0) ? (c + 0x100000000) : c;
-
+    function equal(a, b) {
+      if (a.length !== b.length) return false;
+      for (let i = a.length; -1 < i; --i) {
+        if ((a[i] !== b[i])) return false;
+      }
+      return true;
+    }
     // Transform char code to its hexadecimal value
     const hd = (c) => (c & 0xf) + 9 * (c >> 6);
 
@@ -498,7 +511,7 @@
         this.hoverCell = void 0;
         this.isPointerDown = false;
         this.lastPaintedKey = void 0;
-        this.maxHistory = 60;
+        this.maxHistory = 64;
         this.maxRecent = 8;
         this.opacity = 255;
         this.pal = {};
@@ -509,7 +522,7 @@
         this.savedSlots = Array(8).fill(0);
         this.showGrid = true;
         this.tool = "draw"; // draw | erase | fill | pick
-        this.undoStack = [];
+        this.resetHistory();
 
         this.ui = Object.fromEntries([
           "brushSize",
@@ -638,7 +651,6 @@
         );
 
         ui.clearBtn.addEventListener("click", () => {
-          this.pushHistory("clear");
           this.clearPixels();
           this.render();
         });
@@ -760,19 +772,11 @@
 
       setGridSize(gridSize, destructive = true) {
         this.ui.gridSize.value = this.gridSize = gridSize;
-
         this.allocatePixelBuffer();
         this.adjustCanvasSize();
-
-        // Reset history cause snapshots are grid-size specific.
-        // Pretending we can “undo” across different dimensions is how you invent nonsense.
-        this.undoStack = [];
-        this.redoStack = [];
-        this.pushHistory(destructive ? "grid-change" : "grid");
-
+        this.pushHistory("setGridSize");
         this.hoverCell = void 0;
         this.lastPaintedKey = void 0;
-
         this.updateStatus();
         this.render();
       }
@@ -921,32 +925,22 @@
 
       confirmNewProject() {
         const gridSize = parseInt(this.ui.modalGridSize.value, 10);
-
         this.closeModal();
-
+        this.resetHistory();
         if (gridSize !== this.gridSize) {
           this.setGridSize(gridSize, true);
-          // setGridSize already resets history and renders
           return;
         }
-
-        // Same grid size: clear and reset history cleanly
         this.clearPixels();
-
-        this.undoStack = [];
-        this.redoStack = [];
-        this.pushHistory("new-project");
-
         this.hoverCell = void 0;
         this.lastPaintedKey = void 0;
-
         this.updateStatus();
         this.render();
       }
 
       onPointerDown(e) {
         e.preventDefault();
-        const {tool} = this
+        const { tool } = this
         this.isPointerDown = true;
         this.lastPaintedKey = void 0;
         this.canvas.setPointerCapture?.(e.pointerId);
@@ -963,7 +957,7 @@
         }
 
         if (tool === "fill") {
-          const {currentColor} = this
+          const { currentColor } = this
           const target = this.pixels[cell];
           if (target === currentColor) return;
 
@@ -974,10 +968,9 @@
           return;
         }
 
-        if((tool === "draw") || (tool === "erase")){
+        if ((tool === "draw") || (tool === "erase")) {
           this.applyToolAt(cell);
           this.render();
-          this.pushHistory(tool);
         }
       }
 
@@ -1017,6 +1010,7 @@
       onPointerUp() {
         this.isPointerDown = false;
         this.lastPaintedKey = void 0;
+        this.pushHistory(this.tool);
         this.updateHistoryButtons();
       }
 
@@ -1101,15 +1095,16 @@
           const current = pixels[i];
           if ((current !== target) || (cast(current) === color)) continue;
           pixels[i] = color;
-          if(x < (g - 1)) stack.push(g * y + x + 1);
-          if(x) stack.push(g * y + x - 1);
-          if(y < (g - 1)) stack.push(g * (y + 1) + x);
-          if(y) stack.push(g * (y - 1) + x);
+          if (x < (g - 1)) stack.push(g * y + x + 1);
+          if (x) stack.push(g * y + x - 1);
+          if (y < (g - 1)) stack.push(g * (y + 1) + x);
+          if (y) stack.push(g * (y - 1) + x);
         }
       }
 
       clearPixels() {
         this.pixels.fill(0);
+        this.pushHistory("clear");
       }
 
       flipHorizontal() {
@@ -1134,17 +1129,25 @@
         this.render();
       }
 
+      resetHistory() {
+        this.redoStack = [];
+        this.undoStack = [];
+      }
+
       pushHistory(reason = "change") {
+        const { pixels, undoStack } = this
+        const last = undoStack[undoStack.length - 1]
+        if (last && equal(last, pixels)) return;
         const snap = {
           gridSize: this.gridSize,
-          pixels: new Int32Array(this.pixels),
+          pixels: new Int32Array(pixels),
           reason,
         };
-        this.undoStack.push(snap);
-
-        if (this.undoStack.length > this.maxHistory) {
-          this.undoStack.shift();
+        if (undoStack.length === this.maxHistory) {
+          undoStack.shift();
         }
+        undoStack.push(snap);
+
 
         this.redoStack = [];
         this.updateHistoryButtons();
@@ -1172,13 +1175,6 @@
         const { ui } = this
         ui.undoBtn.disabled = this.undoStack.length < 2;
         ui.redoBtn.disabled = this.redoStack.length === 0;
-
-        ui.undoBtn.style.filter = ui.undoBtn.disabled
-          ? "grayscale(0.4) opacity(0.75)"
-          : "none";
-        ui.redoBtn.style.filter = ui.redoBtn.disabled
-          ? "grayscale(0.4) opacity(0.75)"
-          : "none";
       }
       // Its late, im knackered
       updateStatus() {
