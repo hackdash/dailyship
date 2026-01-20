@@ -568,10 +568,6 @@
         return Math.floor(i / this.gridSize);
       }
 
-      setPixel(i, color) {
-        this.pixels[i] = color;
-      }
-
       allocatePixelBuffer() {
         this.pixels = new Int32Array(this.gridSize * this.gridSize);
       }
@@ -597,7 +593,7 @@
         const { ui } = this
         const { brushSize } = ui
         ui.colorPicker.addEventListener("change", (e) => {
-          this.setColor(e.target.value + this.opacity, true);
+          this.setColor(colorInt(e.target.value) + this.opacity, true);
         });
 
         brushSize.addEventListener("blur", (e) => this.setBrush(e.target.value));
@@ -950,7 +946,7 @@
 
       onPointerDown(e) {
         e.preventDefault();
-
+        const {tool} = this
         this.isPointerDown = true;
         this.lastPaintedKey = void 0;
         this.canvas.setPointerCapture?.(e.pointerId);
@@ -960,30 +956,29 @@
 
         this.hoverCell = cell;
 
-        // Pick is not a drawing action, so no,no history checkpoint.
-        if (this.tool === "pick") {
+        if (tool === "pick") {
           this.pickColorAt(cell);
           this.render();
           return;
         }
 
-        // Transform/draw actions should be undoable.
-        this.pushHistory("stroke-start");
-
-        if (this.tool === "fill") {
+        if (tool === "fill") {
+          const {currentColor} = this
           const target = this.pixels[cell];
-          const replacement = this.currentColor;
-          if (target === replacement) return;
+          if (target === currentColor) return;
 
-          this.floodFillIterative(cell, target, replacement);
-          this.addRecentColor(replacement);
+          this.floodFillIterative(cell, target, currentColor);
+          this.addRecentColor(currentColor);
           this.renderPalette();
           this.render();
           return;
         }
 
-        this.applyToolAt(cell);
-        this.render();
+        if((tool === "draw") || (tool === "erase")){
+          this.applyToolAt(cell);
+          this.render();
+          this.pushHistory(tool);
+        }
       }
 
       onPointerMove(e) {
@@ -1055,7 +1050,7 @@
       applyToolAt(i) {
         const x0 = this.getX(i)
         const y0 = this.getY(i)
-        const { brushSize, gridSize } = this
+        const { brushSize, pixels, gridSize } = this
         const half = Math.floor(this.brushSize / 2);
         const paintValue =
           this.tool === "erase"
@@ -1078,7 +1073,7 @@
               x >= gridSize ||
               y >= gridSize
             ) continue;
-            this.setPixel(this.idx(x, y), paintValue);
+            this.pixels[this.idx(x, y)] = paintValue;
           }
         }
         if (paintValue) {
@@ -1103,20 +1098,13 @@
           const i = stack.pop()
           const x = this.getX(i)
           const y = this.getY(i)
-          if (
-            x < 0 ||
-            y < 0 ||
-            x >= g ||
-            y >= g
-          ) continue;
           const current = pixels[i];
-          if (current !== target) continue;
-          this.setPixel(i, color);
-
-          stack.push(g * (y - 1) + x);
-          stack.push(g * (y + 1) + x);
-          stack.push(g * y + x - 1);
-          stack.push(g * y + x + 1);
+          if ((current !== target) || (cast(current) === color)) continue;
+          pixels[i] = color;
+          if(x < (g - 1)) stack.push(g * y + x + 1);
+          if(x) stack.push(g * y + x - 1);
+          if(y < (g - 1)) stack.push(g * (y + 1) + x);
+          if(y) stack.push(g * (y - 1) + x);
         }
       }
 
@@ -1139,17 +1127,19 @@
         // this.render();
       }
 
-      snapshot() {
-        return { gridSize: this.gridSize, pixels: this.pixels };
-      }
-
       restoreSnapshot(snap) {
-        if (!snap || snap.gridSize !== this.gridSize) return;
+        if (!snap || (snap.gridSize !== this.gridSize)) return;
         this.pixels = snap.pixels
+        this.updateHistoryButtons();
+        this.render();
       }
 
       pushHistory(reason = "change") {
-        const snap = this.snapshot();
+        const snap = {
+          gridSize: this.gridSize,
+          pixels: new Int32Array(this.pixels),
+          reason,
+        };
         this.undoStack.push(snap);
 
         if (this.undoStack.length > this.maxHistory) {
@@ -1168,20 +1158,14 @@
 
         const prev = this.undoStack[this.undoStack.length - 1];
         this.restoreSnapshot(prev);
-
-        this.updateHistoryButtons();
-        this.render();
       }
 
       redo() {
-        if (this.redoStack.length === 0) return;
+        if (!this.redoStack.length) return;
 
         const next = this.redoStack.pop();
         this.undoStack.push(next);
         this.restoreSnapshot(next);
-
-        this.updateHistoryButtons();
-        this.render();
       }
 
       updateHistoryButtons() {
