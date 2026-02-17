@@ -130,7 +130,7 @@ export PATH=$HOME/.local/bin:$PATH
   - [Standard library](https://docs.python.org/3/library)
   - [NumPy](https://numpy.org/doc/stable) for scientific computing with multidimensional arrays and operations for Fourier transforms, input/output, linear algebra, logic, maths, shaping, sorting, selection, random simulation, and statistics.
   - Import any other Python package.
-  - *Note that indentation and upfront looops are not ideal for terminal sessions.*
+  - *Note that indentation and upfront loops are not ideal for terminal sessions.*
 - [Jupyter Notebook](https://jupyter-notebook.readthedocs.io/) & [SageMath](https://www.sagemath.org/)
   - Another Python-based option with web interface and folder structure to save and organize every input you ever made.
   - There are different ways of installing Jupyter Notebook, but I found a container bundled with SageMath, which provides yet another option.
