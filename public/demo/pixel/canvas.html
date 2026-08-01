@@ -1,0 +1,30 @@
+<!doctype html>
+<style>
+body{margin:0;}
+</style>
+<canvas id="canvas"></canvas>
+<script>
+const w = 512
+const f = 256/w
+const canvas = document.getElementById("canvas")
+canvas.width = w
+canvas.height = w
+const ctx = canvas.getContext("2d")
+const img = ctx.createImageData(w, w)
+function dot(image, i, color){
+  image.data[i*4] = color[0]
+  image.data[i*4 + 1] = color[1]
+  image.data[i*4 + 2] = color[2]
+  image.data[i*4 + 3] = color[3] ?? 255
+}
+for (let i = 0; i < img.data.length; i += 1) {
+  dot(img, i, [255, i%w * f, f*i/w, 255])
+}
+const color = [0,0,0]
+dot(img, 0, color)
+dot(img, w-1, color)
+dot(img, w*(w-1), color)
+dot(img, w*w-1, color)
+
+ctx.putImageData(img, 0, 0)
+</script>
