@@ -32,7 +32,7 @@ dot(img, w*w-1, ...color)
 myImg.onload = function(){
   const canvas = document.createElement('canvas')
   canvas.height = this.height
-  sprite_w = canvas.width = this.width
+  canvas.width = this.width
   const context = canvas.getContext('2d')
   context.drawImage(myImg, 0, 0)
   const sprite = context.getImageData(0, 0, this.width, this.height)
