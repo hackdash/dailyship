@@ -82,18 +82,18 @@ function base64ToBytes(b64) {
   for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
   return bytes
 }
-function dot(image, i, r,g,b,a){
-  image.data[i*4] = r ?? 0
-  image.data[i*4 + 1] = g ?? 0
-  image.data[i*4 + 2] = b ?? 0
-  image.data[i*4 + 3] = a ?? 255
+function dot(image, i, r=0,g=0,b=0,a=255){
+  image.data[i*4] = r
+  image.data[i*4 + 1] = g
+  image.data[i*4 + 2] = b
+  image.data[i*4 + 3] = a
 }
 function magnify(scale, x, y, sprite, c){
   const sprite_bytes = sprite.data
   const sprite_w = sprite.width
   for(let i=0, len=sprite_bytes.length; i<len; i+=4){
     if(!sprite_bytes[i+3]) continue
-    c.fillStyle = `rgba(${sprite_bytes[i]??0},${sprite_bytes[i+1]??0},${sprite_bytes[i+2]??0},${sprite_bytes[i+3]??255})`;
+    c.fillStyle = `rgba(${sprite_bytes[i]},${sprite_bytes[i+1]},${sprite_bytes[i+2]},${sprite_bytes[i+3]})`;
     c.fillRect(x + scale * ((i/4)%sprite_w), y + scale * floor(i/(4*sprite_w)), scale, scale)
   }
 }
